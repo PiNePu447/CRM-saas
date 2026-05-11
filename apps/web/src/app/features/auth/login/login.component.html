@@ -1,0 +1,63 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="#4F46E5"/>
+        <path d="M12 20C12 15.582 15.582 12 20 12C22.21 12 24.21 12.895 25.657 14.343L23.536 16.464C22.629 15.557 21.378 15 20 15C17.239 15 15 17.239 15 20C15 22.761 17.239 25 20 25C21.378 25 22.629 24.443 23.536 23.536L25.657 25.657C24.21 27.105 22.21 28 20 28C15.582 28 12 24.418 12 20Z" fill="white"/>
+        <path d="M24 20H28M28 20L26 18M28 20L26 22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="auth-logo-text">CRM</span>
+    </div>
+
+    <h1 class="auth-title">Entrar na sua conta</h1>
+    <p class="auth-subtitle">Bem-vindo de volta! Digite suas credenciais.</p>
+
+    <div *ngIf="error" class="auth-error">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 4a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0V5zm-.75 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+      {{ error }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+      <div class="form-group">
+        <label class="form-label" for="email">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-input"
+          [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
+          placeholder="seu@email.com"
+          autocomplete="email"
+        />
+        <span *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="input-error-msg">
+          E-mail inválido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Senha</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="form-input"
+          [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading || form.invalid">
+        <span *ngIf="!loading">Entrar</span>
+        <span *ngIf="loading" class="btn-loading">
+          <span class="spinner"></span> Entrando...
+        </span>
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Não tem uma conta?
+      <a routerLink="/auth/register" class="auth-link">Criar conta</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Contatos</h1>
+      <p class="page-subtitle">{{ meta.total }} contatos encontrados</p>
+    </div>
+    <a routerLink="/contacts/new" class="btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Novo Contato
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-wrapper">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input
+        type="text"
+        class="form-input search-input"
+        placeholder="Buscar por nome, email ou telefone..."
+        [value]="search"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+
+    <select class="form-input filter-select" [value]="statusFilter" (change)="onStatusChange($any($event.target).value)">
+      <option value="">Todos os status</option>
+      <option value="LEAD">Lead</option>
+      <option value="QUALIFIED">Qualificado</option>
+      <option value="CUSTOMER">Cliente</option>
+      <option value="CHURNED">Churn</option>
+      <option value="LOST">Perdido</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-lg"></div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="table-wrapper">
+    <table class="data-table" *ngIf="contacts.length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Empresa</th>
+          <th>Status</th>
+          <th>Responsável</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contact of contacts">
+          <td>
+            <div class="contact-cell">
+              <div class="contact-avatar">{{ contact.name.charAt(0) }}</div>
+              <span class="contact-name">{{ contact.name }}</span>
+            </div>
+          </td>
+          <td class="text-secondary">{{ contact.email || '—' }}</td>
+          <td class="text-secondary">{{ contact.phone || '—' }}</td>
+          <td class="text-secondary">{{ contact.company?.name || '—' }}</td>
+          <td>
+            <span class="badge" [ngClass]="getStatusClass(contact.status)">
+              {{ getStatusLabel(contact.status) }}
+            </span>
+          </td>
+          <td class="text-secondary">{{ contact.owner?.name || '—' }}</td>
+          <td>
+            <a [routerLink]="['/contacts', contact.id]" class="btn-ghost-sm">Ver →</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <p>Nenhum contato encontrado</p>
+        <a routerLink="/contacts/new" class="btn-primary">Adicionar primeiro contato</a>
+      </div>
+    </ng-template>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="meta.totalPages > 1">
+      <button class="btn-ghost" [disabled]="meta.page <= 1" (click)="goToPage(meta.page - 1)">
+        ← Anterior
+      </button>
+      <span class="pagination-info">Página {{ meta.page }} de {{ meta.totalPages }}</span>
+      <button class="btn-ghost" [disabled]="meta.page >= meta.totalPages" (click)="goToPage(meta.page + 1)">
+        Próxima →
+      </button>
+    </div>
+  </div>
+</div>

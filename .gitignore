@@ -24,3 +24,9 @@ coverage/
 # IDE
 .vscode/
 .idea/
+.cursor/
+
+.angular
+
+# Nx
+.nx/

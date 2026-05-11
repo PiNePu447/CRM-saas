@@ -1,0 +1,289 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================
+// ENUMS
+// =====================
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  SELLER
+
+  @@map("user_role")
+}
+
+enum ContactStatus {
+  LEAD
+  QUALIFIED
+  CUSTOMER
+  CHURNED
+  LOST
+
+  @@map("contact_status")
+}
+
+enum ActivityType {
+  NOTE
+  EMAIL
+  CALL
+  MEETING
+  STATUS_CHANGE
+  DEAL_MOVED
+  TASK_CREATED
+
+  @@map("activity_type")
+}
+
+// =====================
+// CORE MODELS
+// =====================
+
+model Tenant {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  settings  Json      @default("{}")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  users      User[]
+  contacts   Contact[]
+  companies  Company[]
+  deals      Deal[]
+  tasks      Task[]
+  activities Activity[]
+  pipelines  Pipeline[]
+  tags       Tag[]
+
+  @@map("tenants")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  email        String
+  passwordHash String    @map("password_hash")
+  name         String
+  role         UserRole  @default(SELLER)
+  isActive     Boolean   @default(true) @map("is_active")
+  refreshToken String?   @map("refresh_token")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  tenant        Tenant     @relation(fields: [tenantId], references: [id])
+  ownedContacts Contact[]  @relation("ContactOwner")
+  ownedDeals    Deal[]     @relation("DealOwner")
+  assignedTasks Task[]     @relation("TaskAssignee")
+  activities    Activity[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+// =====================
+// CONTACTS & COMPANIES
+// =====================
+
+model Contact {
+  id           String        @id @default(uuid())
+  tenantId     String        @map("tenant_id")
+  ownerId      String        @map("owner_id")
+  companyId    String?       @map("company_id")
+  name         String
+  email        String?
+  phone        String?
+  status       ContactStatus @default(LEAD)
+  customFields Json          @default("{}") @map("custom_fields")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  deletedAt    DateTime?     @map("deleted_at")
+
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  owner      User         @relation("ContactOwner", fields: [ownerId], references: [id])
+  company    Company?     @relation(fields: [companyId], references: [id])
+  deals      Deal[]
+  activities Activity[]
+  tasks      Task[]
+  tags       ContactTag[]
+
+  @@index([tenantId, ownerId])
+  @@index([tenantId, status])
+  @@index([tenantId, companyId])
+  @@map("contacts")
+}
+
+model Company {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  name         String
+  domain       String?
+  industry     String?
+  size         String?
+  customFields Json      @default("{}") @map("custom_fields")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  contacts Contact[]
+
+  @@index([tenantId])
+  @@map("companies")
+}
+
+model Tag {
+  id       String @id @default(uuid())
+  tenantId String @map("tenant_id")
+  name     String
+  color    String @default("#6B7280")
+
+  tenant   Tenant       @relation(fields: [tenantId], references: [id])
+  contacts ContactTag[]
+
+  @@unique([tenantId, name])
+  @@map("tags")
+}
+
+model ContactTag {
+  contactId String @map("contact_id")
+  tagId     String @map("tag_id")
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, tagId])
+  @@map("contact_tags")
+}
+
+// =====================
+// SALES PIPELINE
+// =====================
+
+model Pipeline {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant          @relation(fields: [tenantId], references: [id])
+  stages PipelineStage[]
+  deals  Deal[]
+
+  @@index([tenantId])
+  @@map("pipelines")
+}
+
+model PipelineStage {
+  id                 String @id @default(uuid())
+  pipelineId         String @map("pipeline_id")
+  name               String
+  position           Int
+  probabilityDefault Int    @default(50) @map("probability_default")
+  color              String @default("#6B7280")
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals    Deal[]
+
+  @@unique([pipelineId, position])
+  @@map("pipeline_stages")
+}
+
+model Deal {
+  id                String    @id @default(uuid())
+  tenantId          String    @map("tenant_id")
+  contactId         String    @map("contact_id")
+  ownerId           String    @map("owner_id")
+  pipelineId        String    @map("pipeline_id")
+  stageId           String    @map("stage_id")
+  title             String
+  value             Decimal?  @db.Decimal(15, 2)
+  probability       Int       @default(50)
+  expectedCloseDate DateTime? @map("expected_close_date")
+  position          Float     @default(0)
+  closedAt          DateTime? @map("closed_at")
+  closedReason      String?   @map("closed_reason")
+  isWon             Boolean?  @map("is_won")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  tenant   Tenant        @relation(fields: [tenantId], references: [id])
+  contact  Contact       @relation(fields: [contactId], references: [id])
+  owner    User          @relation("DealOwner", fields: [ownerId], references: [id])
+  pipeline Pipeline      @relation(fields: [pipelineId], references: [id])
+  stage    PipelineStage @relation(fields: [stageId], references: [id])
+  tasks    Task[]
+  activities Activity[]
+
+  @@index([tenantId, stageId, position])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, pipelineId])
+  @@map("deals")
+}
+
+// =====================
+// TASKS
+// =====================
+
+model Task {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  assignedTo  String    @map("assigned_to")
+  contactId   String?   @map("contact_id")
+  dealId      String?   @map("deal_id")
+  title       String
+  description String?
+  dueDate     DateTime? @map("due_date")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  assignee User     @relation("TaskAssignee", fields: [assignedTo], references: [id])
+  contact  Contact? @relation(fields: [contactId], references: [id])
+  deal     Deal?    @relation(fields: [dealId], references: [id])
+
+  @@index([tenantId, assignedTo])
+  @@index([tenantId, dueDate])
+  @@index([tenantId, contactId])
+  @@map("tasks")
+}
+
+// =====================
+// ACTIVITY TIMELINE
+// =====================
+
+model Activity {
+  id        String       @id @default(uuid())
+  tenantId  String       @map("tenant_id")
+  contactId String       @map("contact_id")
+  dealId    String?      @map("deal_id")
+  userId    String       @map("user_id")
+  type      ActivityType
+  content   Json         @default("{}")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  contact Contact @relation(fields: [contactId], references: [id])
+  deal    Deal?   @relation(fields: [dealId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, contactId, createdAt(sort: Desc)])
+  @@index([tenantId, dealId])
+  @@map("activities")
+}

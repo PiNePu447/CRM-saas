@@ -1,0 +1,60 @@
+<div class="auth-wrapper">
+  <div class="auth-card auth-card-wide">
+    <div class="auth-logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="#4F46E5"/>
+        <path d="M12 20C12 15.582 15.582 12 20 12C22.21 12 24.21 12.895 25.657 14.343L23.536 16.464C22.629 15.557 21.378 15 20 15C17.239 15 15 17.239 15 20C15 22.761 17.239 25 20 25C21.378 25 22.629 24.443 23.536 23.536L25.657 25.657C24.21 27.105 22.21 28 20 28C15.582 28 12 24.418 12 20Z" fill="white"/>
+        <path d="M24 20H28M28 20L26 18M28 20L26 22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="auth-logo-text">CRM</span>
+    </div>
+
+    <h1 class="auth-title">Criar sua conta</h1>
+    <p class="auth-subtitle">Configure seu CRM em menos de 1 minuto.</p>
+
+    <div *ngIf="error" class="auth-error">{{ error }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome da Empresa</label>
+          <input type="text" formControlName="tenantName" class="form-input" placeholder="Acme Corp" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Slug <span class="form-hint">(usado na URL)</span>
+          </label>
+          <input type="text" formControlName="tenantSlug" class="form-input" placeholder="acme-corp" />
+          <span *ngIf="form.get('tenantSlug')?.invalid && form.get('tenantSlug')?.touched" class="input-error-msg">
+            Use apenas letras minúsculas, números e hífens
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Seu nome completo</label>
+        <input type="text" formControlName="name" class="form-input" placeholder="João Silva" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input type="email" formControlName="email" class="form-input" placeholder="joao@acmecorp.com" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Senha <span class="form-hint">(mínimo 8 caracteres)</span></label>
+        <input type="password" formControlName="password" class="form-input" placeholder="••••••••" />
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading || form.invalid">
+        <span *ngIf="!loading">Criar conta gratuitamente</span>
+        <span *ngIf="loading"><span class="spinner"></span> Criando...</span>
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Já tem uma conta?
+      <a routerLink="/auth/login" class="auth-link">Entrar</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<div class="page page-full">
+  <div class="page-header">
+    <h1 class="page-title">Negócios</h1>
+    <div class="page-header-actions">
+      <select
+        *ngIf="pipelines.length > 1"
+        class="form-input pipeline-select"
+        [value]="selectedPipelineId"
+        (change)="onPipelineChange($any($event.target).value)"
+      >
+        <option *ngFor="let p of pipelines" [value]="p.id">{{ p.name }}</option>
+      </select>
+      <button class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Negócio
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-lg"></div>
+  </div>
+
+  <div *ngIf="!loading && board" class="kanban-board" cdkDropListGroup>
+    <div
+      *ngFor="let stage of board.stages"
+      class="kanban-column"
+      [id]="stage.id"
+      cdkDropList
+      [cdkDropListData]="stage.deals"
+      [cdkDropListConnectedTo]="getStageConnectedList(stage.id)"
+      (cdkDropListDropped)="onDrop($event, stage)"
+    >
+      <!-- Column Header -->
+      <div class="kanban-column-header">
+        <div class="column-title-row">
+          <div class="column-dot" [style.background]="stage.color"></div>
+          <span class="column-title">{{ stage.name }}</span>
+          <span class="column-count">{{ stage.deals.length }}</span>
+        </div>
+        <span class="column-total" *ngIf="stage.totalValue > 0">
+          {{ formatTotalValue(stage.totalValue) }}
+        </span>
+      </div>
+
+      <!-- Deal Cards -->
+      <div class="kanban-cards" cdkDropList [id]="stage.id + '-list'" [cdkDropListData]="stage.deals">
+        <div
+          *ngFor="let deal of stage.deals"
+          class="kanban-card"
+          cdkDrag
+          [cdkDragData]="deal"
+        >
+          <div class="card-drag-handle" cdkDragHandle>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+
+          <div class="card-content">
+            <p class="card-title">{{ deal.title }}</p>
+            <div class="card-contact">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              {{ deal.contact.name }}
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <span *ngIf="deal.value" class="card-value">{{ formatCurrency(deal.value) }}</span>
+            <span *ngIf="deal.expectedCloseDate" class="card-date">
+              {{ deal.expectedCloseDate | date:'dd/MM' }}
+            </span>
+            <div class="card-owner" [title]="deal.owner.name">
+              {{ deal.owner.name.charAt(0) }}
+            </div>
+          </div>
+
+          <!-- Drag preview placeholder -->
+          <div *cdkDragPlaceholder class="kanban-card-placeholder"></div>
+        </div>
+      </div>
+
+      <!-- Add deal button -->
+      <button class="kanban-add-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar
+      </button>
+    </div>
+
+    <!-- Empty board state -->
+    <div *ngIf="board.stages.length === 0" class="empty-state">
+      <p>Configure seu pipeline para começar.</p>
+    </div>
+  </div>
+</div>
