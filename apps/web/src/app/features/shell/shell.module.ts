@@ -37,9 +37,14 @@ import { AuthGuard } from '../../core/guards/auth.guard';
               import('../tasks/tasks.module').then((m) => m.TasksModule),
           },
           {
-            path: 'clients',
+            path: 'companies',
             loadChildren: () =>
               import('../clients/clients.module').then((m) => m.ClientsModule),
+          },
+          {
+            path: 'clients',
+            redirectTo: 'companies',
+            pathMatch: 'full',
           },
         ],
       },

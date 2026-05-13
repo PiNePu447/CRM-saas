@@ -9,12 +9,14 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { DealsService } from '../deals/deals.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly dealsService: DealsService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -43,6 +45,8 @@ export class AuthService {
       },
       include: { users: true },
     });
+
+    await this.dealsService.seedDefaultPipeline(tenant.id);
 
     const user = tenant.users[0];
     const tokens = await this.generateTokens(user.id, tenant.id, user.role, user.email);
@@ -77,7 +81,9 @@ export class AuthService {
 
     return {
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
-      tenant: { id: user.tenant.id, name: user.tenant.name, slug: user.tenant.slug },
+      tenant: user.tenant
+        ? { id: user.tenant.id, name: user.tenant.name, slug: user.tenant.slug }
+        : null,
       ...tokens,
     };
   }
@@ -86,7 +92,7 @@ export class AuthService {
     try {
       const payload = this.jwtService.verify<{
         sub: string;
-        tenantId: string;
+        tenantId: string | null;
         role: string;
         email: string;
       }>(refreshToken, { secret: process.env.JWT_REFRESH_SECRET });
@@ -121,9 +127,9 @@ export class AuthService {
     });
   }
 
-  async getProfile(userId: string, tenantId: string) {
+  async getProfile(userId: string, tenantId: string | null) {
     const user = await this.prisma.user.findFirst({
-      where: { id: userId, tenantId, deletedAt: null },
+      where: { id: userId, ...(tenantId ? { tenantId } : {}), deletedAt: null },
       include: { tenant: { select: { id: true, name: true, slug: true, settings: true } } },
     });
 
@@ -134,11 +140,11 @@ export class AuthService {
       name: user.name,
       email: user.email,
       role: user.role,
-      tenant: user.tenant,
+      tenant: user.tenant ?? null,
     };
   }
 
-  private async generateTokens(userId: string, tenantId: string, role: string, email: string) {
+  private async generateTokens(userId: string, tenantId: string | null, role: string, email: string) {
     const payload = { sub: userId, tenantId, role, email };
 
     const [accessToken, refreshToken] = await Promise.all([

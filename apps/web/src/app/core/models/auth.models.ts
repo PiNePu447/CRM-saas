@@ -15,7 +15,7 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   user: UserProfile;
-  tenant: TenantInfo;
+  tenant: TenantInfo | null;
 }
 
 export interface UserProfile {
@@ -23,7 +23,7 @@ export interface UserProfile {
   name: string;
   email: string;
   role: UserRole;
-  tenant?: TenantInfo;
+  tenant?: TenantInfo | null;
 }
 
 export interface TenantInfo {
@@ -33,4 +33,4 @@ export interface TenantInfo {
   settings?: Record<string, unknown>;
 }
 
-export type UserRole = 'ADMIN' | 'MANAGER' | 'SELLER';
+export type UserRole = 'PLATFORM_ADMIN' | 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'SELLER';

@@ -18,6 +18,11 @@ export class ClientsListComponent implements OnInit {
   search = '';
   searchDebounce: ReturnType<typeof setTimeout> | null = null;
 
+  modalVisible = false;
+  editingCompany: Company | null = null;
+  deleteConfirmId: string | null = null;
+  deleting = false;
+
   constructor(private readonly companiesService: CompaniesService) {}
 
   ngOnInit(): void {
@@ -59,6 +64,59 @@ export class ClientsListComponent implements OnInit {
     }
   }
 
+  openCreateModal(): void {
+    this.editingCompany = null;
+    this.modalVisible = true;
+  }
+
+  openEditModal(company: Company, event: Event): void {
+    event.stopPropagation();
+    this.editingCompany = company;
+    this.modalVisible = true;
+  }
+
+  onModalClosed(): void {
+    this.modalVisible = false;
+    this.editingCompany = null;
+  }
+
+  onCompanySaved(company: Company): void {
+    this.modalVisible = false;
+    this.editingCompany = null;
+
+    const idx = this.companies.findIndex((c) => c.id === company.id);
+    if (idx >= 0) {
+      this.companies[idx] = { ...this.companies[idx], ...company };
+    } else {
+      this.loadCompanies();
+    }
+  }
+
+  confirmDelete(id: string, event: Event): void {
+    event.stopPropagation();
+    this.deleteConfirmId = id;
+  }
+
+  cancelDelete(): void {
+    this.deleteConfirmId = null;
+  }
+
+  deleteCompany(): void {
+    if (!this.deleteConfirmId) return;
+    this.deleting = true;
+
+    this.companiesService.delete(this.deleteConfirmId).subscribe({
+      next: () => {
+        this.companies = this.companies.filter((c) => c.id !== this.deleteConfirmId);
+        this.deleteConfirmId = null;
+        this.deleting = false;
+      },
+      error: () => {
+        this.deleting = false;
+      },
+    });
+  }
+
   contactStatusLabel(status: string): string {
     const labels: Record<string, string> = {
       LEAD: 'Lead',
@@ -79,5 +137,25 @@ export class ClientsListComponent implements OnInit {
       LOST: 'badge-red',
     };
     return classes[status] ?? 'badge-gray';
+  }
+
+  companyStatusLabel(status: string | undefined): string {
+    const labels: Record<string, string> = {
+      PROSPECT: 'Prospecto',
+      ACTIVE: 'Ativo',
+      INACTIVE: 'Inativo',
+      CHURNED: 'Churn',
+    };
+    return labels[status ?? ''] ?? '';
+  }
+
+  companyStatusClass(status: string | undefined): string {
+    const classes: Record<string, string> = {
+      PROSPECT: 'badge-gray',
+      ACTIVE: 'badge-green',
+      INACTIVE: 'badge-yellow',
+      CHURNED: 'badge-red',
+    };
+    return classes[status ?? ''] ?? 'badge-gray';
   }
 }

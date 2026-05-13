@@ -5,7 +5,7 @@ import { tenantStorage } from './tenant.context';
 
 interface JwtPayload {
   sub: string;
-  tenantId: string;
+  tenantId: string | null;
   role: string;
   email: string;
 }

@@ -15,6 +15,8 @@ datasource db {
 // =====================
 
 enum UserRole {
+  PLATFORM_ADMIN
+  SUPER_ADMIN
   ADMIN
   MANAGER
   SELLER
@@ -30,6 +32,15 @@ enum ContactStatus {
   LOST
 
   @@map("contact_status")
+}
+
+enum CompanyStatus {
+  PROSPECT
+  ACTIVE
+  INACTIVE
+  CHURNED
+
+  @@map("company_status")
 }
 
 enum ActivityType {
@@ -71,8 +82,8 @@ model Tenant {
 
 model User {
   id           String    @id @default(uuid())
-  tenantId     String    @map("tenant_id")
-  email        String
+  tenantId     String?   @map("tenant_id")
+  email        String    @unique
   passwordHash String    @map("password_hash")
   name         String
   role         UserRole  @default(SELLER)
@@ -82,13 +93,12 @@ model User {
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
 
-  tenant        Tenant     @relation(fields: [tenantId], references: [id])
+  tenant        Tenant?    @relation(fields: [tenantId], references: [id])
   ownedContacts Contact[]  @relation("ContactOwner")
   ownedDeals    Deal[]     @relation("DealOwner")
   assignedTasks Task[]     @relation("TaskAssignee")
   activities    Activity[]
 
-  @@unique([tenantId, email])
   @@index([tenantId])
   @@map("users")
 }
@@ -127,21 +137,23 @@ model Contact {
 }
 
 model Company {
-  id           String    @id @default(uuid())
-  tenantId     String    @map("tenant_id")
+  id           String        @id @default(uuid())
+  tenantId     String        @map("tenant_id")
   name         String
   domain       String?
   industry     String?
   size         String?
-  customFields Json      @default("{}") @map("custom_fields")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
+  status       CompanyStatus @default(PROSPECT)
+  customFields Json          @default("{}") @map("custom_fields")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  deletedAt    DateTime?     @map("deleted_at")
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id])
   contacts Contact[]
 
   @@index([tenantId])
+  @@index([tenantId, status])
   @@map("companies")
 }
 

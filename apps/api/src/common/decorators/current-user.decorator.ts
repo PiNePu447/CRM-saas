@@ -3,7 +3,7 @@ import { FastifyRequest } from 'fastify';
 
 export interface CurrentUserData {
   sub: string;
-  tenantId: string;
+  tenantId: string | null;
   role: string;
   email: string;
 }

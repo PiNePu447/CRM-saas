@@ -17,6 +17,12 @@ import { DealsService } from './deals.service';
 import { CreatePipelineDto } from './dto/create-pipeline.dto';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { MoveDealDto } from './dto/move-deal.dto';
+import {
+  CreateStageInPipelineDto,
+  ReorderStagesDto,
+  UpdatePipelineDto,
+  UpdateStageDto,
+} from './dto/update-pipeline.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -44,6 +50,71 @@ export class DealsController {
   @ApiOperation({ summary: 'Create a new pipeline with stages' })
   createPipeline(@CurrentUser() user: CurrentUserData, @Body() dto: CreatePipelineDto) {
     return this.dealsService.createPipeline(user.tenantId, dto);
+  }
+
+  @Patch('pipelines/:id')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update pipeline name or default status' })
+  updatePipeline(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserData,
+    @Body() dto: UpdatePipelineDto,
+  ) {
+    return this.dealsService.updatePipeline(user.tenantId, id, dto);
+  }
+
+  @Delete('pipelines/:id')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a pipeline (only if it has no deals)' })
+  deletePipeline(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
+    return this.dealsService.deletePipeline(user.tenantId, id);
+  }
+
+  @Post('pipelines/:id/stages')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Add a new stage to a pipeline' })
+  createStage(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserData,
+    @Body() dto: CreateStageInPipelineDto,
+  ) {
+    return this.dealsService.createStage(user.tenantId, id, dto);
+  }
+
+  @Patch('pipelines/:id/stages/reorder')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Reorder stages within a pipeline' })
+  reorderStages(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserData,
+    @Body() dto: ReorderStagesDto,
+  ) {
+    return this.dealsService.reorderStages(user.tenantId, id, dto);
+  }
+
+  @Patch('pipelines/:id/stages/:stageId')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update a stage (name, color, probability)' })
+  updateStage(
+    @Param('id') id: string,
+    @Param('stageId') stageId: string,
+    @CurrentUser() user: CurrentUserData,
+    @Body() dto: UpdateStageDto,
+  ) {
+    return this.dealsService.updateStage(user.tenantId, id, stageId, dto);
+  }
+
+  @Delete('pipelines/:id/stages/:stageId')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a stage (only if it has no deals)' })
+  deleteStage(
+    @Param('id') id: string,
+    @Param('stageId') stageId: string,
+    @CurrentUser() user: CurrentUserData,
+  ) {
+    return this.dealsService.deleteStage(user.tenantId, id, stageId);
   }
 
   // =====================

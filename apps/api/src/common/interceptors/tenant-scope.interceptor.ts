@@ -16,7 +16,7 @@ export class TenantScopeInterceptor implements NestInterceptor {
     if (user?.tenantId) {
       return new Observable((subscriber) => {
         tenantStorage.run(
-          { tenantId: user.tenantId, userId: user.sub, userRole: user.role },
+          { tenantId: user.tenantId as string, userId: user.sub, userRole: user.role },
           () => {
             next.handle().subscribe(subscriber);
           },

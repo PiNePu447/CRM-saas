@@ -2,12 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsObject,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { CompanyStatus } from '@prisma/client';
 
 export class CreateCompanyDto {
   @ApiProperty({ example: 'Acme Corp' })
@@ -30,6 +32,11 @@ export class CreateCompanyDto {
   @IsString()
   size?: string;
 
+  @ApiPropertyOptional({ enum: CompanyStatus })
+  @IsOptional()
+  @IsEnum(CompanyStatus)
+  status?: CompanyStatus;
+
   @ApiPropertyOptional({ type: Object })
   @IsOptional()
   @IsObject()
@@ -49,7 +56,7 @@ export class CompaniesService {
         deletedAt: null,
         ...(search && { name: { contains: search, mode: 'insensitive' } }),
       },
-      include: { _count: { select: { contacts: true } } },
+      include: { _count: { select: { contacts: { where: { deletedAt: null } } } } },
       orderBy: { name: 'asc' },
     });
   }
@@ -63,7 +70,7 @@ export class CompaniesService {
           select: { id: true, name: true, email: true, status: true },
           orderBy: { name: 'asc' },
         },
-        _count: { select: { contacts: true } },
+        _count: { select: { contacts: { where: { deletedAt: null } } } },
       },
     });
 

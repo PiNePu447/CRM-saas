@@ -33,7 +33,13 @@ export class LoginComponent implements OnInit {
     this.error = null;
 
     this.authService.login(this.form.value).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: (res) => {
+        if (res.user?.role === 'PLATFORM_ADMIN') {
+          this.router.navigate(['/platform']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
       error: (err) => {
         this.error = err.error?.message?.error ?? 'Email ou senha inválidos';
         this.loading = false;

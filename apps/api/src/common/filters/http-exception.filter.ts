@@ -7,12 +7,21 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { ServerResponse } from 'http';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
   async catch(exception: unknown, host: ArgumentsHost): Promise<void> {
+    if (host.getType() !== 'http') {
+      this.logger.error(
+        'Exception in non-HTTP context',
+        exception instanceof Error ? exception.stack : String(exception),
+      );
+      return;
+    }
+
     const ctx = host.switchToHttp();
     const reply = ctx.getResponse<FastifyReply>();
     const request = ctx.getRequest<FastifyRequest>();
@@ -30,7 +39,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (status >= 500) {
       this.logger.error(
         `${request.method} ${request.url}`,
-        exception instanceof Error ? exception.stack : String(exception)
+        exception instanceof Error ? exception.stack : String(exception),
       );
     }
 
@@ -41,6 +50,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message: typeof message === 'object' ? message : { error: message },
     };
 
-    await reply.code(status).send(errorResponse);
+    // TenantMiddleware uses raw Node.js req/res — FastifyReply methods not available
+    if (typeof (reply as unknown as FastifyReply).code === 'function') {
+      await (reply as unknown as FastifyReply).code(status).send(errorResponse);
+    } else {
+      const raw = reply as unknown as ServerResponse;
+      raw.writeHead(status, { 'Content-Type': 'application/json' });
+      raw.end(JSON.stringify(errorResponse));
+    }
   }
 }

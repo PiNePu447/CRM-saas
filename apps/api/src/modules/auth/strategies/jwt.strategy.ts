@@ -1,11 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 export interface JwtPayload {
   sub: string;
-  tenantId: string;
+  tenantId: string | null;
   role: string;
   email: string;
 }
@@ -13,10 +13,14 @@ export interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly prisma: PrismaService) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new InternalServerErrorException('JWT_SECRET environment variable is not set');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET ?? 'default_secret',
+      secretOrKey: secret,
     });
   }
 
@@ -24,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.prisma.user.findFirst({
       where: {
         id: payload.sub,
-        tenantId: payload.tenantId,
+        ...(payload.tenantId ? { tenantId: payload.tenantId } : {}),
         isActive: true,
         deletedAt: null,
       },

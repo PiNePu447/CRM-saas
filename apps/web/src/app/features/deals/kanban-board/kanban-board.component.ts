@@ -5,6 +5,7 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { DealsService } from '../../../core/services/deals.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Deal, KanbanBoard, KanbanStage, Pipeline } from '../../../core/models/deal.models';
 
 @Component({ standalone: false,
@@ -21,7 +22,16 @@ export class KanbanBoardComponent implements OnInit {
   editingDeal: Deal | null = null;
   preselectedStageId: string | null = null;
 
-  constructor(private readonly dealsService: DealsService) {}
+  showPipelineSettings = false;
+
+  constructor(
+    private readonly dealsService: DealsService,
+    private readonly authService: AuthService,
+  ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.currentUser?.role === 'ADMIN';
+  }
 
   ngOnInit(): void {
     this.dealsService.listPipelines().subscribe({
@@ -118,6 +128,30 @@ export class KanbanBoardComponent implements OnInit {
   closeDealForm(): void {
     this.showDealForm = false;
     this.editingDeal = null;
+  }
+
+  openPipelineSettings(): void {
+    this.showPipelineSettings = true;
+  }
+
+  onPipelineSettingsClosed(updatedPipelines: Pipeline[]): void {
+    this.showPipelineSettings = false;
+    const prevCount = this.pipelines.length;
+    this.pipelines = updatedPipelines;
+
+    // Reload pipelines from API to ensure consistency, then reload board
+    this.dealsService.listPipelines().subscribe({
+      next: (pipelines) => {
+        this.pipelines = pipelines;
+        const defaultPipeline = pipelines.find((p) => p.isDefault) ?? pipelines[0];
+        if (defaultPipeline) {
+          this.selectedPipelineId = defaultPipeline.id;
+          this.loadBoard(defaultPipeline.id);
+        } else if (prevCount > 0 && pipelines.length === 0) {
+          this.board = null;
+        }
+      },
+    });
   }
 
   getStageConnectedList(currentStageId: string): string[] {

@@ -1,6 +1,15 @@
 <div class="page">
   <div class="page-header">
-    <h1 class="page-title">Clientes</h1>
+    <div>
+      <h1 class="page-title">Empresas</h1>
+      <p class="page-subtitle">Gerencie as empresas e suas equipes de contatos</p>
+    </div>
+    <button class="btn-primary" (click)="openCreateModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nova Empresa
+    </button>
   </div>
 
   <div class="filters-bar">
@@ -10,6 +19,7 @@
       placeholder="Buscar empresa..."
       [(ngModel)]="search"
       (ngModelChange)="onSearchChange()"
+      style="max-width: 360px;"
     />
   </div>
 
@@ -19,13 +29,28 @@
 
   <div *ngIf="!loading" class="clients-list">
     <div *ngIf="companies.length === 0" class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
       <p>Nenhuma empresa encontrada.</p>
+      <button class="btn-primary" style="margin-top:12px" (click)="openCreateModal()">Adicionar Empresa</button>
     </div>
 
     <div *ngFor="let company of companies" class="company-card">
+      <!-- Delete confirmation overlay -->
+      <div *ngIf="deleteConfirmId === company.id" class="delete-confirm-bar">
+        <span>Remover <strong>{{ company.name }}</strong>? Esta ação não pode ser desfeita.</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" (click)="cancelDelete()" [disabled]="deleting">Cancelar</button>
+          <button class="btn-danger" (click)="deleteCompany()" [disabled]="deleting">
+            {{ deleting ? 'Removendo...' : 'Confirmar Remoção' }}
+          </button>
+        </div>
+      </div>
+
       <!-- Company Header (clickable accordion) -->
-      <div class="company-header" (click)="toggleCompany(company)">
+      <div class="company-header" (click)="toggleCompany(company)" *ngIf="deleteConfirmId !== company.id">
         <div class="company-info">
           <div class="company-avatar">{{ company.name.charAt(0).toUpperCase() }}</div>
           <div class="company-details">
@@ -33,20 +58,46 @@
             <div class="company-meta">
               <span *ngIf="company.industry" class="company-industry">{{ company.industry }}</span>
               <span *ngIf="company.domain" class="company-domain">{{ company.domain }}</span>
+              <span *ngIf="company.size" class="company-size">{{ company.size }} func.</span>
+              <span *ngIf="company.status" class="badge" [ngClass]="companyStatusClass(company.status)">
+                {{ companyStatusLabel(company.status) }}
+              </span>
               <span class="company-count">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
                 {{ company._count?.contacts ?? 0 }} contato(s)
               </span>
             </div>
           </div>
         </div>
-        <div class="company-toggle" [class.expanded]="company.expanded">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="company-actions">
+          <button class="btn-ghost-sm" title="Editar empresa" (click)="openEditModal(company, $event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="btn-ghost-sm btn-danger-sm" title="Remover empresa" (click)="confirmDelete(company.id, $event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+          <div class="company-toggle" [class.expanded]="company.expanded">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
         </div>
       </div>
 
       <!-- Contacts List (expanded) -->
-      <div *ngIf="company.expanded" class="company-contacts">
+      <div *ngIf="company.expanded && deleteConfirmId !== company.id" class="company-contacts">
         <div *ngIf="company.loadingContacts" class="loading-state-sm">
           <div class="spinner"></div>
         </div>
@@ -74,3 +125,11 @@
     </div>
   </div>
 </div>
+
+<!-- Create / Edit Modal -->
+<app-company-form
+  [visible]="modalVisible"
+  [company]="editingCompany"
+  (closed)="onModalClosed()"
+  (saved)="onCompanySaved($event)"
+></app-company-form>

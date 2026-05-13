@@ -1,14 +1,41 @@
-import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from '@fastify/helmet';
 import { AppModule } from './app/app.module';
 
+function assertRequiredEnv() {
+  const required = ['JWT_SECRET', 'JWT_REFRESH_SECRET'];
+  const missing = required.filter((k) => !process.env[k]);
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+  if ((process.env.JWT_SECRET?.length ?? 0) < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters long');
+  }
+  if ((process.env.JWT_REFRESH_SECRET?.length ?? 0) < 32) {
+    throw new Error('JWT_REFRESH_SECRET must be at least 32 characters long');
+  }
+}
+
 async function bootstrap() {
+  if (process.env.NODE_ENV === 'production') {
+    assertRequiredEnv();
+  }
+
+  const isProd = process.env.NODE_ENV === 'production';
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ logger: process.env.NODE_ENV !== 'production' }),
+    new FastifyAdapter({ logger: !isProd }),
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await app.register(helmet as any, {
+    contentSecurityPolicy: isProd,
+    crossOriginEmbedderPolicy: false,
+  });
 
   const globalPrefix = process.env.API_PREFIX ?? 'api/v1';
   app.setGlobalPrefix(globalPrefix);
@@ -22,26 +49,29 @@ async function bootstrap() {
     }),
   );
 
+  const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:4200',
+    origin: corsOrigin ? corsOrigin.split(',').map((o) => o.trim()) : 'http://localhost:4200',
     credentials: true,
   });
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('CRM API')
-    .setDescription('CRM SaaS Multi-tenant REST API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  if (!isProd) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('CRM API')
+      .setDescription('CRM SaaS Multi-tenant REST API')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+    Logger.log(`Swagger docs at http://localhost:${process.env.API_PORT ?? 3000}/${globalPrefix}/docs`);
+  }
 
   const port = process.env.API_PORT ?? 3000;
   await app.listen(port, '0.0.0.0');
 
   Logger.log(`Application running on http://localhost:${port}/${globalPrefix}`);
-  Logger.log(`Swagger docs at http://localhost:${port}/${globalPrefix}/docs`);
 }
 
 bootstrap();

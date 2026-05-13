@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -8,6 +9,12 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePipelineDto } from './dto/create-pipeline.dto';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { MoveDealDto } from './dto/move-deal.dto';
+import {
+  CreateStageInPipelineDto,
+  ReorderStagesDto,
+  UpdatePipelineDto,
+  UpdateStageDto,
+} from './dto/update-pipeline.dto';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateDealDto as BaseDealDto } from './dto/create-deal.dto';
 
@@ -75,6 +82,111 @@ export class DealsService {
         { name: 'Ganho', position: 4, probabilityDefault: 100, color: '#10B981' },
         { name: 'Perdido', position: 5, probabilityDefault: 0, color: '#EF4444' },
       ],
+    });
+  }
+
+  async updatePipeline(tenantId: string, pipelineId: string, dto: UpdatePipelineDto) {
+    const pipeline = await this.prisma.pipeline.findFirst({ where: { id: pipelineId, tenantId } });
+    if (!pipeline) throw new NotFoundException(`Pipeline ${pipelineId} not found`);
+
+    if (dto.isDefault) {
+      await this.prisma.pipeline.updateMany({
+        where: { tenantId, isDefault: true, id: { not: pipelineId } },
+        data: { isDefault: false },
+      });
+    }
+
+    return this.prisma.pipeline.update({
+      where: { id: pipelineId },
+      data: { ...(dto.name && { name: dto.name }), ...(dto.isDefault !== undefined && { isDefault: dto.isDefault }) },
+      include: { stages: { orderBy: { position: 'asc' } } },
+    });
+  }
+
+  async deletePipeline(tenantId: string, pipelineId: string) {
+    const pipeline = await this.prisma.pipeline.findFirst({
+      where: { id: pipelineId, tenantId },
+      include: { _count: { select: { deals: true } } },
+    });
+    if (!pipeline) throw new NotFoundException(`Pipeline ${pipelineId} not found`);
+    if (pipeline._count.deals > 0) {
+      throw new BadRequestException('Não é possível remover um pipeline que possui negócios');
+    }
+    await this.prisma.pipeline.delete({ where: { id: pipelineId } });
+  }
+
+  async createStage(tenantId: string, pipelineId: string, dto: CreateStageInPipelineDto) {
+    const pipeline = await this.prisma.pipeline.findFirst({ where: { id: pipelineId, tenantId } });
+    if (!pipeline) throw new NotFoundException(`Pipeline ${pipelineId} not found`);
+
+    const lastStage = await this.prisma.pipelineStage.findFirst({
+      where: { pipelineId },
+      orderBy: { position: 'desc' },
+      select: { position: true },
+    });
+
+    return this.prisma.pipelineStage.create({
+      data: {
+        pipelineId,
+        name: dto.name,
+        position: (lastStage?.position ?? -1) + 1,
+        probabilityDefault: dto.probabilityDefault ?? 50,
+        color: dto.color ?? '#6B7280',
+      },
+    });
+  }
+
+  async updateStage(tenantId: string, pipelineId: string, stageId: string, dto: UpdateStageDto) {
+    const stage = await this.prisma.pipelineStage.findFirst({
+      where: { id: stageId, pipelineId, pipeline: { tenantId } },
+    });
+    if (!stage) throw new NotFoundException(`Stage ${stageId} not found`);
+
+    return this.prisma.pipelineStage.update({
+      where: { id: stageId },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.position !== undefined && { position: dto.position }),
+        ...(dto.probabilityDefault !== undefined && { probabilityDefault: dto.probabilityDefault }),
+        ...(dto.color !== undefined && { color: dto.color }),
+      },
+    });
+  }
+
+  async deleteStage(tenantId: string, pipelineId: string, stageId: string) {
+    const stage = await this.prisma.pipelineStage.findFirst({
+      where: { id: stageId, pipelineId, pipeline: { tenantId } },
+      include: { _count: { select: { deals: true } } },
+    });
+    if (!stage) throw new NotFoundException(`Stage ${stageId} not found`);
+    if (stage._count.deals > 0) {
+      throw new BadRequestException('Não é possível remover um estágio que possui negócios. Mova os negócios primeiro.');
+    }
+    await this.prisma.pipelineStage.delete({ where: { id: stageId } });
+  }
+
+  async reorderStages(tenantId: string, pipelineId: string, dto: ReorderStagesDto) {
+    const pipeline = await this.prisma.pipeline.findFirst({
+      where: { id: pipelineId, tenantId },
+      include: { stages: true },
+    });
+    if (!pipeline) throw new NotFoundException(`Pipeline ${pipelineId} not found`);
+
+    const stageIds = pipeline.stages.map((s) => s.id);
+    const allValid = dto.stageIds.every((id) => stageIds.includes(id));
+    if (!allValid || dto.stageIds.length !== stageIds.length) {
+      throw new BadRequestException('Lista de estágios inválida para reordenação');
+    }
+
+    await this.prisma.$transaction(
+      dto.stageIds.map((id, index) =>
+        this.prisma.pipelineStage.update({ where: { id }, data: { position: index } }),
+      ),
+    );
+
+    return this.prisma.pipeline.findUnique({
+      where: { id: pipelineId },
+      include: { stages: { orderBy: { position: 'asc' } } },
     });
   }
 

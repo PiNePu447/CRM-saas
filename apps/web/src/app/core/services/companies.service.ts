@@ -3,12 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type CompanyStatus = 'PROSPECT' | 'ACTIVE' | 'INACTIVE' | 'CHURNED';
+
 export interface Company {
   id: string;
   name: string;
   domain?: string;
   industry?: string;
   size?: string;
+  status?: CompanyStatus;
   _count?: { contacts: number };
 }
 

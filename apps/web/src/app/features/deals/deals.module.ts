@@ -5,9 +5,10 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { KanbanBoardComponent } from './kanban-board/kanban-board.component';
 import { DealFormComponent } from './deal-form/deal-form.component';
+import { PipelineSettingsComponent } from './pipeline-settings/pipeline-settings.component';
 
 @NgModule({
-  declarations: [KanbanBoardComponent, DealFormComponent],
+  declarations: [KanbanBoardComponent, DealFormComponent, PipelineSettingsComponent],
   imports: [
     CommonModule,
     FormsModule,
