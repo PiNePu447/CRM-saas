@@ -1,5 +1,5 @@
 import {
-  ForbiddenException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -96,7 +96,23 @@ export class ContactsService {
 
   async create(tenantId: string, userId: string, userRole: string, dto: CreateContactDto) {
     const ownerId = dto.ownerId && userRole !== UserRole.SELLER ? dto.ownerId : userId;
-    const { tagIds, ...data } = dto;
+    const { tagIds, birthDate, ...data } = dto;
+
+    if (dto.email) {
+      const existing = await this.prisma.contact.findFirst({
+        where: { tenantId, email: dto.email, deletedAt: null },
+      });
+      if (existing) {
+        throw new ConflictException(`Já existe um contato com o email "${dto.email}"`);
+      }
+    }
+
+    const existingByName = await this.prisma.contact.findFirst({
+      where: { tenantId, name: { equals: dto.name, mode: 'insensitive' }, deletedAt: null },
+    });
+    if (existingByName) {
+      throw new ConflictException(`Já existe um contato com o nome "${dto.name}"`);
+    }
 
     return this.prisma.contact.create({
       data: {
@@ -104,6 +120,7 @@ export class ContactsService {
         tenantId,
         ownerId,
         customFields: (data.customFields as object) ?? {},
+        ...(birthDate && { birthDate: new Date(birthDate + 'T12:00:00Z') }),
         ...(tagIds?.length && {
           tags: { create: tagIds.map((tagId) => ({ tagId })) },
         }),
@@ -125,7 +142,16 @@ export class ContactsService {
   ) {
     await this.assertCanModify(id, tenantId, userId, userRole);
 
-    const { tagIds, ...data } = dto;
+    if (dto.email) {
+      const existing = await this.prisma.contact.findFirst({
+        where: { tenantId, email: dto.email, deletedAt: null, NOT: { id } },
+      });
+      if (existing) {
+        throw new ConflictException(`Já existe um contato com o email "${dto.email}"`);
+      }
+    }
+
+    const { tagIds, birthDate, ...data } = dto;
 
     return this.prisma.$transaction(async (tx) => {
       if (tagIds !== undefined) {
@@ -142,6 +168,7 @@ export class ContactsService {
         data: {
           ...data,
           ...(data.customFields && { customFields: data.customFields as object }),
+          ...(birthDate !== undefined && { birthDate: birthDate ? new Date(birthDate + 'T12:00:00Z') : null }),
         },
         include: {
           company: { select: { id: true, name: true } },

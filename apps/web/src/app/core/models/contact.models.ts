@@ -8,6 +8,7 @@ export interface Contact {
   name: string;
   email?: string;
   phone?: string;
+  birthDate?: string;
   status: ContactStatus;
   customFields: Record<string, unknown>;
   createdAt: string;

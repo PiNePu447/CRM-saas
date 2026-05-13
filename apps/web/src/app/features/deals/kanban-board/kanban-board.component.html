@@ -10,7 +10,7 @@
       >
         <option *ngFor="let p of pipelines" [value]="p.id">{{ p.name }}</option>
       </select>
-      <button class="btn-primary">
+      <button class="btn-primary" (click)="openNewDeal()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Novo Negócio
       </button>
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Deal Cards -->
-      <div class="kanban-cards" cdkDropList [id]="stage.id + '-list'" [cdkDropListData]="stage.deals">
+      <div class="kanban-cards">
         <div
           *ngFor="let deal of stage.deals"
           class="kanban-card"
@@ -55,7 +55,7 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
           </div>
 
-          <div class="card-content">
+          <div class="card-content" (click)="openEditDeal(deal)" style="cursor:pointer">
             <p class="card-title">{{ deal.title }}</p>
             <div class="card-contact">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -79,7 +79,7 @@
       </div>
 
       <!-- Add deal button -->
-      <button class="kanban-add-btn">
+      <button class="kanban-add-btn" (click)="openNewDeal(stage.id)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Adicionar
       </button>
@@ -91,3 +91,13 @@
     </div>
   </div>
 </div>
+
+<!-- Deal Form Modal -->
+<app-deal-form
+  *ngIf="showDealForm"
+  [deal]="editingDeal"
+  [preselectedStageId]="preselectedStageId"
+  [pipelines]="pipelines"
+  (saved)="onDealSaved($event)"
+  (cancelled)="closeDealForm()"
+></app-deal-form>

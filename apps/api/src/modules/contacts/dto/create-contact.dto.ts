@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ContactStatus } from '@prisma/client';
 import {
+  IsDateString,
   IsEmail,
   IsEnum,
   IsObject,
@@ -25,6 +26,11 @@ export class CreateContactDto {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @ApiPropertyOptional({ example: '1990-05-13', description: 'Data de nascimento (ISO 8601)' })
+  @IsOptional()
+  @IsDateString()
+  birthDate?: string;
 
   @ApiPropertyOptional({ enum: ContactStatus, default: ContactStatus.LEAD })
   @IsOptional()

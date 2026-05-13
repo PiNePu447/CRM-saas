@@ -17,6 +17,10 @@ export class KanbanBoardComponent implements OnInit {
   selectedPipelineId: string | null = null;
   loading = true;
 
+  showDealForm = false;
+  editingDeal: Deal | null = null;
+  preselectedStageId: string | null = null;
+
   constructor(private readonly dealsService: DealsService) {}
 
   ngOnInit(): void {
@@ -89,6 +93,31 @@ export class KanbanBoardComponent implements OnInit {
     this.dealsService.move(deal.id, stageId, newPosition).subscribe({
       error: () => this.loadBoard(this.selectedPipelineId!),
     });
+  }
+
+  openNewDeal(stageId?: string): void {
+    this.editingDeal = null;
+    this.preselectedStageId = stageId ?? null;
+    this.showDealForm = true;
+  }
+
+  openEditDeal(deal: Deal): void {
+    this.editingDeal = deal;
+    this.preselectedStageId = null;
+    this.showDealForm = true;
+  }
+
+  onDealSaved(deal: Deal): void {
+    this.showDealForm = false;
+    this.editingDeal = null;
+    if (this.selectedPipelineId) {
+      this.loadBoard(this.selectedPipelineId);
+    }
+  }
+
+  closeDealForm(): void {
+    this.showDealForm = false;
+    this.editingDeal = null;
   }
 
   getStageConnectedList(currentStageId: string): string[] {

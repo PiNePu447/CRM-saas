@@ -15,6 +15,7 @@ export class SidebarComponent {
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'grid' },
     { label: 'Contatos', route: '/contacts', icon: 'users' },
+    { label: 'Clientes', route: '/clients', icon: 'briefcase' },
     { label: 'Negócios', route: '/deals', icon: 'trending-up' },
     { label: 'Tarefas', route: '/tasks', icon: 'check-square' },
   ];

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsService } from '../../../core/services/contacts.service';
 import { Contact, Activity } from '../../../core/models/contact.models';
 
@@ -26,8 +26,11 @@ export class ContactDetailComponent implements OnInit {
     TASK_CREATED: '✅',
   };
 
+  deleting = false;
+
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly contactsService: ContactsService,
   ) {}
 
@@ -79,6 +82,16 @@ export class ContactDetailComponent implements OnInit {
         },
         error: () => (this.savingNote = false),
       });
+  }
+
+  deleteContact(): void {
+    if (!this.contact) return;
+    if (!confirm(`Excluir o contato "${this.contact.name}"? Esta ação não pode ser desfeita.`)) return;
+    this.deleting = true;
+    this.contactsService.delete(this.contact.id).subscribe({
+      next: () => this.router.navigate(['/contacts']),
+      error: () => (this.deleting = false),
+    });
   }
 
   getActivityLabel(type: string): string {

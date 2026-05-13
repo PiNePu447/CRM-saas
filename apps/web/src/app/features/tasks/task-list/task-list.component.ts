@@ -16,6 +16,9 @@ export class TaskListComponent implements OnInit {
   calendarDays: { date: Date; tasks: Task[] }[] = [];
   calendarMonth: Date = new Date();
 
+  showTaskForm = false;
+  editingTask: Task | null = null;
+
   constructor(private readonly tasksService: TasksService) {}
 
   ngOnInit(): void {
@@ -96,6 +99,36 @@ export class TaskListComponent implements OnInit {
         if (this.filterCompleted === false) {
           this.tasks = this.tasks.filter((t) => !t.completedAt);
         }
+      },
+    });
+  }
+
+  openNewTask(): void {
+    this.editingTask = null;
+    this.showTaskForm = true;
+  }
+
+  openEditTask(task: Task): void {
+    this.editingTask = task;
+    this.showTaskForm = true;
+  }
+
+  onTaskSaved(task: Task): void {
+    this.showTaskForm = false;
+    this.editingTask = null;
+    this.loadTasks();
+  }
+
+  closeTaskForm(): void {
+    this.showTaskForm = false;
+    this.editingTask = null;
+  }
+
+  deleteTask(task: Task): void {
+    if (!confirm(`Excluir a tarefa "${task.title}"?`)) return;
+    this.tasksService.delete(task.id).subscribe({
+      next: () => {
+        this.tasks = this.tasks.filter((t) => t.id !== task.id);
       },
     });
   }

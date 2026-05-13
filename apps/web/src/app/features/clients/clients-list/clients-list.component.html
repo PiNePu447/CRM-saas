@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Clientes</h1>
+  </div>
+
+  <div class="filters-bar">
+    <input
+      type="text"
+      class="form-input search-input"
+      placeholder="Buscar empresa..."
+      [(ngModel)]="search"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-lg"></div>
+  </div>
+
+  <div *ngIf="!loading" class="clients-list">
+    <div *ngIf="companies.length === 0" class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      <p>Nenhuma empresa encontrada.</p>
+    </div>
+
+    <div *ngFor="let company of companies" class="company-card">
+      <!-- Company Header (clickable accordion) -->
+      <div class="company-header" (click)="toggleCompany(company)">
+        <div class="company-info">
+          <div class="company-avatar">{{ company.name.charAt(0).toUpperCase() }}</div>
+          <div class="company-details">
+            <span class="company-name">{{ company.name }}</span>
+            <div class="company-meta">
+              <span *ngIf="company.industry" class="company-industry">{{ company.industry }}</span>
+              <span *ngIf="company.domain" class="company-domain">{{ company.domain }}</span>
+              <span class="company-count">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                {{ company._count?.contacts ?? 0 }} contato(s)
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="company-toggle" [class.expanded]="company.expanded">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <!-- Contacts List (expanded) -->
+      <div *ngIf="company.expanded" class="company-contacts">
+        <div *ngIf="company.loadingContacts" class="loading-state-sm">
+          <div class="spinner"></div>
+        </div>
+
+        <div *ngIf="!company.loadingContacts">
+          <div *ngIf="!company.contacts?.length" class="empty-state-sm">
+            Nenhum contato nesta empresa.
+          </div>
+          <a
+            *ngFor="let contact of company.contacts"
+            [routerLink]="['/contacts', contact.id]"
+            class="contact-row"
+          >
+            <div class="contact-avatar-sm">{{ contact.name.charAt(0).toUpperCase() }}</div>
+            <div class="contact-row-info">
+              <span class="contact-row-name">{{ contact.name }}</span>
+              <span *ngIf="contact.email" class="contact-row-email">{{ contact.email }}</span>
+            </div>
+            <span class="badge" [ngClass]="contactStatusClass(contact.status)">
+              {{ contactStatusLabel(contact.status) }}
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

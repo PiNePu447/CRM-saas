@@ -1,0 +1,101 @@
+<div class="modal-backdrop" (click)="close()"></div>
+<div class="modal">
+  <div class="modal-header">
+    <h2 class="modal-title">{{ deal ? 'Editar Negócio' : 'Novo Negócio' }}</h2>
+    <button class="modal-close" (click)="close()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <div class="form-group">
+      <label class="form-label">Título <span class="required">*</span></label>
+      <input
+        type="text"
+        class="form-input"
+        formControlName="title"
+        placeholder="Ex: Proposta ERP - Acme"
+        [class.input-error]="form.get('title')?.invalid && form.get('title')?.touched"
+      />
+      <span *ngIf="form.get('title')?.invalid && form.get('title')?.touched" class="field-error">
+        Título é obrigatório (mínimo 2 caracteres)
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Contato <span class="required">*</span></label>
+      <select
+        class="form-input"
+        formControlName="contactId"
+        [class.input-error]="form.get('contactId')?.invalid && form.get('contactId')?.touched"
+      >
+        <option value="">Selecione um contato</option>
+        <option *ngFor="let c of contacts" [value]="c.id">{{ c.name }}</option>
+      </select>
+      <span *ngIf="form.get('contactId')?.invalid && form.get('contactId')?.touched" class="field-error">
+        Contato é obrigatório
+      </span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Pipeline <span class="required">*</span></label>
+        <select class="form-input" formControlName="pipelineId">
+          <option *ngFor="let p of pipelines" [value]="p.id">{{ p.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Etapa <span class="required">*</span></label>
+        <select
+          class="form-input"
+          formControlName="stageId"
+          [class.input-error]="form.get('stageId')?.invalid && form.get('stageId')?.touched"
+        >
+          <option value="">Selecione uma etapa</option>
+          <option *ngFor="let s of stages" [value]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Valor (R$)</label>
+        <input
+          type="number"
+          class="form-input"
+          formControlName="value"
+          placeholder="Ex: 15000"
+          min="0"
+          step="0.01"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Probabilidade (%)</label>
+        <input
+          type="number"
+          class="form-input"
+          formControlName="probability"
+          min="0"
+          max="100"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Previsão de Fechamento</label>
+      <input type="date" class="form-input" formControlName="expectedCloseDate" />
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-ghost" (click)="close()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+        <span *ngIf="!saving">{{ deal ? 'Salvar alterações' : 'Criar negócio' }}</span>
+        <span *ngIf="saving"><span class="spinner"></span></span>
+      </button>
+    </div>
+  </form>
+</div>

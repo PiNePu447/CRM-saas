@@ -1,5 +1,5 @@
 import {
-  ForbiddenException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -173,6 +173,20 @@ export class DealsService {
 
   async create(tenantId: string, userId: string, userRole: string, dto: CreateDealDto) {
     const ownerId = dto.ownerId && userRole !== UserRole.SELLER ? dto.ownerId : userId;
+
+    const duplicate = await this.prisma.deal.findFirst({
+      where: {
+        tenantId,
+        contactId: dto.contactId,
+        title: { equals: dto.title, mode: 'insensitive' },
+        deletedAt: null,
+      },
+    });
+    if (duplicate) {
+      throw new ConflictException(
+        `Já existe um negócio com o título "${dto.title}" para este contato`,
+      );
+    }
 
     const lastDeal = await this.prisma.deal.findFirst({
       where: { tenantId, stageId: dto.stageId, deletedAt: null },

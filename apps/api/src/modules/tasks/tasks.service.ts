@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ActivityType, UserRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -91,6 +91,21 @@ export class TasksService {
 
   async create(tenantId: string, userId: string, dto: CreateTaskDto) {
     const assignedTo = dto.assignedTo ?? userId;
+
+    const duplicate = await this.prisma.task.findFirst({
+      where: {
+        tenantId,
+        assignedTo,
+        title: { equals: dto.title, mode: 'insensitive' },
+        completedAt: null,
+        ...(dto.dueDate && {
+          dueDate: new Date(dto.dueDate),
+        }),
+      },
+    });
+    if (duplicate) {
+      throw new ConflictException(`Já existe uma tarefa com o título "${dto.title}" para este usuário`);
+    }
 
     const task = await this.prisma.task.create({
       data: {

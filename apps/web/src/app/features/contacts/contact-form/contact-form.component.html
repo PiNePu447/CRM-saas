@@ -1,0 +1,102 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <a routerLink="/contacts" class="breadcrumb-link">Contatos</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>{{ isEdit ? 'Editar Contato' : 'Novo Contato' }}</span>
+      </div>
+      <h1 class="page-title">{{ isEdit ? 'Editar Contato' : 'Novo Contato' }}</h1>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-lg"></div>
+  </div>
+
+  <div *ngIf="!loading" class="form-card">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+      <div class="form-group">
+        <label class="form-label" for="name">Nome <span class="required">*</span></label>
+        <input
+          id="name"
+          type="text"
+          class="form-input"
+          formControlName="name"
+          placeholder="Ex: João Silva"
+          [class.input-error]="form.get('name')?.invalid && form.get('name')?.touched"
+        />
+        <span
+          *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
+          class="field-error"
+        >
+          Nome é obrigatório (mínimo 2 caracteres)
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-input"
+          formControlName="email"
+          placeholder="Ex: joao@empresa.com"
+          [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
+        />
+        <span
+          *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+          class="field-error"
+        >
+          Email inválido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Telefone</label>
+        <input
+          id="phone"
+          type="text"
+          class="form-input"
+          formControlName="phone"
+          placeholder="Ex: +55 11 99999-9999"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="companyId">Empresa</label>
+        <select id="companyId" class="form-input" formControlName="companyId">
+          <option value="">-- Nenhuma --</option>
+          <option *ngFor="let company of companies" [value]="company.id">{{ company.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="birthDate">Data de Nascimento</label>
+        <input
+          id="birthDate"
+          type="date"
+          class="form-input"
+          formControlName="birthDate"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="status">Status</label>
+        <select id="status" class="form-input" formControlName="status">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-ghost" (click)="cancel()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          <span *ngIf="!saving">{{ isEdit ? 'Salvar alterações' : 'Criar contato' }}</span>
+          <span *ngIf="saving"><span class="spinner"></span></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
