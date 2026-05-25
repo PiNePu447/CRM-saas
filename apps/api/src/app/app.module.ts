@@ -15,8 +15,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { AllExceptionsFilter } from '../common/filters/http-exception.filter';
 import { TenantScopeInterceptor } from '../common/interceptors/tenant-scope.interceptor';
 import { TenantMiddleware } from '../common/tenant/tenant.middleware';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
@@ -35,6 +38,7 @@ import { TenantMiddleware } from '../common/tenant/tenant.middleware';
     PlatformModule,
   ],
   providers: [
+    AppService,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
