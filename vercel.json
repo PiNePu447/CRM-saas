@@ -5,8 +5,8 @@
   "installCommand": "npm ci --legacy-peer-deps",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://crm-api.onrender.com/api/:path*"
+      "source": "/api/v1/:path*",
+      "destination": "https://crm-api-fzhl.onrender.com/api/v1/:path*"
     },
     {
       "source": "/((?!api/).*)",
