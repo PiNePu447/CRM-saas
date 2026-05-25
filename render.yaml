@@ -2,7 +2,7 @@ services:
   - type: web
     name: crm-api
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
     buildCommand: npm ci --legacy-peer-deps && npm run build:api && npx prisma generate
     startCommand: node dist/apps/api/main.js
