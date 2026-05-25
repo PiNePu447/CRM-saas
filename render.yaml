@@ -4,14 +4,12 @@ services:
     runtime: node
     plan: free
     region: oregon
-    buildCommand: npm ci --legacy-peer-deps && npm run build:api && npx prisma generate
+    buildCommand: npm ci --legacy-peer-deps --include=dev && npm run build:api && npx prisma generate
     startCommand: node dist/apps/api/main.js
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: API_PORT
-        value: 3000
       - key: API_PREFIX
         value: api/v1
       - key: DATABASE_URL

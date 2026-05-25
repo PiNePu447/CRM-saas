@@ -4,6 +4,9 @@
   "license": "MIT",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=20.11.0 <21"
+  },
   "scripts": {
     "api:dev": "nx serve api",
     "web:dev": "nx serve web",
