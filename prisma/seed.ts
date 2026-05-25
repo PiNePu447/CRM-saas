@@ -16,7 +16,7 @@ async function main() {
     },
   });
 
-  const passwordHash = await bcrypt.hash('Admin@123456', 12);
+  const passwordHash = await bcrypt.hash('senha123', 12);
 
   const admin = await prisma.user.upsert({
     where: { tenantId_email: { tenantId: tenant.id, email: 'admin@demo.com' } },
@@ -36,7 +36,7 @@ async function main() {
     create: {
       tenantId: tenant.id,
       email: 'vendedor@demo.com',
-      passwordHash: await bcrypt.hash('Seller@123456', 12),
+      passwordHash: await bcrypt.hash('senha123', 12),
       name: 'João Vendedor',
       role: 'SELLER',
     },

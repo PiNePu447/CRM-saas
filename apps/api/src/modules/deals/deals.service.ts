@@ -205,6 +205,7 @@ export class DealsService {
     userRole: string,
     pipelineId?: string,
     stageId?: string,
+    ownerId?: string,
   ) {
     const ownerFilter = this.buildOwnerFilter(userId, userRole);
 
@@ -212,6 +213,7 @@ export class DealsService {
       where: {
         tenantId,
         deletedAt: null,
+        ...(ownerId && { ownerId }),
         ...ownerFilter,
         ...(pipelineId && { pipelineId }),
         ...(stageId && { stageId }),
@@ -226,7 +228,7 @@ export class DealsService {
     });
   }
 
-  async getKanban(tenantId: string, userId: string, userRole: string, pipelineId: string) {
+  async getKanban(tenantId: string, userId: string, userRole: string, pipelineId: string, ownerId?: string) {
     const pipeline = await this.prisma.pipeline.findFirst({
       where: { id: pipelineId, tenantId },
       include: { stages: { orderBy: { position: 'asc' } } },
@@ -237,7 +239,7 @@ export class DealsService {
     const ownerFilter = this.buildOwnerFilter(userId, userRole);
 
     const deals = await this.prisma.deal.findMany({
-      where: { tenantId, pipelineId, deletedAt: null, ...ownerFilter },
+      where: { tenantId, pipelineId, deletedAt: null, ...(ownerId && { ownerId }), ...ownerFilter },
       include: {
         contact: { select: { id: true, name: true, email: true } },
         owner: { select: { id: true, name: true } },

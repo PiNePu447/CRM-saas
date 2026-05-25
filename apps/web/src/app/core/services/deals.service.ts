@@ -47,15 +47,18 @@ export class DealsService {
     return this.http.patch<Pipeline>(`${this.api}/deals/pipelines/${pipelineId}/stages/reorder`, { stageIds });
   }
 
-  getKanban(pipelineId: string): Observable<KanbanBoard> {
-    return this.http.get<KanbanBoard>(`${this.api}/deals/kanban/${pipelineId}`);
+  getKanban(pipelineId: string, ownerId?: string): Observable<KanbanBoard> {
+    let url = `${this.api}/deals/kanban/${pipelineId}`;
+    if (ownerId) url += `?ownerId=${encodeURIComponent(ownerId)}`;
+    return this.http.get<KanbanBoard>(url);
   }
 
-  list(pipelineId?: string, stageId?: string): Observable<Deal[]> {
+  list(pipelineId?: string, stageId?: string, ownerId?: string): Observable<Deal[]> {
     let url = `${this.api}/deals`;
     const params: string[] = [];
     if (pipelineId) params.push(`pipelineId=${pipelineId}`);
     if (stageId) params.push(`stageId=${stageId}`);
+    if (ownerId) params.push(`ownerId=${encodeURIComponent(ownerId)}`);
     if (params.length) url += `?${params.join('&')}`;
     return this.http.get<Deal[]>(url);
   }

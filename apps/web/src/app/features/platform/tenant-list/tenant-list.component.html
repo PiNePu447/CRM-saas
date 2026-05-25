@@ -84,9 +84,9 @@
             </div>
           </td>
           <td><code style="font-size:12px;background:var(--gray-100);padding:2px 6px;border-radius:4px">{{ tenant.slug }}</code></td>
-          <td>{{ tenant._count?.users ?? 0 }}</td>
-          <td>{{ tenant._count?.contacts ?? 0 }}</td>
-          <td>{{ tenant._count?.deals ?? 0 }}</td>
+          <td>{{ tenant._count.users }}</td>
+          <td>{{ tenant._count.contacts }}</td>
+          <td>{{ tenant._count.deals }}</td>
           <td>
             <span class="badge" [ngClass]="isActive(tenant) ? 'badge-green' : 'badge-red'">
               {{ isActive(tenant) ? 'Ativo' : 'Inativo' }}
@@ -205,7 +205,7 @@
         <div *ngIf="selectedTenant" style="margin-top:16px">
           <p style="font-size:13px;color:var(--gray-500)">
             Slug: <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px">{{ selectedTenant.slug }}</code>
-            &nbsp;·&nbsp; {{ selectedTenant._count?.users ?? 0 }} usuário(s)
+            &nbsp;·&nbsp; {{ selectedTenant._count.users }} usuário(s)
           </p>
         </div>
       </div>

@@ -3,6 +3,15 @@
     <h1 class="page-title">Negócios</h1>
     <div class="page-header-actions">
       <select
+        *ngIf="canFilter"
+        class="form-input"
+        [(ngModel)]="selectedOwnerId"
+        (ngModelChange)="onOwnerChange($event)"
+      >
+        <option value="">Todos os vendedores</option>
+        <option *ngFor="let u of users" [value]="u.id">{{ u.name }}</option>
+      </select>
+      <select
         *ngIf="pipelines.length > 1"
         class="form-input pipeline-select"
         [value]="selectedPipelineId"

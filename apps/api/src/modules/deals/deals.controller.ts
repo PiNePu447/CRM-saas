@@ -123,8 +123,13 @@ export class DealsController {
 
   @Get('kanban/:pipelineId')
   @ApiOperation({ summary: 'Get Kanban board - stages with deals grouped' })
-  getKanban(@Param('pipelineId') pipelineId: string, @CurrentUser() user: CurrentUserData) {
-    return this.dealsService.getKanban(user.tenantId, user.sub, user.role, pipelineId);
+  @ApiQuery({ name: 'ownerId', required: false })
+  getKanban(
+    @Param('pipelineId') pipelineId: string,
+    @CurrentUser() user: CurrentUserData,
+    @Query('ownerId') ownerId?: string,
+  ) {
+    return this.dealsService.getKanban(user.tenantId, user.sub, user.role, pipelineId, ownerId);
   }
 
   // =====================
@@ -135,12 +140,14 @@ export class DealsController {
   @ApiOperation({ summary: 'List all deals (scoped by role)' })
   @ApiQuery({ name: 'pipelineId', required: false })
   @ApiQuery({ name: 'stageId', required: false })
+  @ApiQuery({ name: 'ownerId', required: false })
   findAll(
     @CurrentUser() user: CurrentUserData,
     @Query('pipelineId') pipelineId?: string,
     @Query('stageId') stageId?: string,
+    @Query('ownerId') ownerId?: string,
   ) {
-    return this.dealsService.findAll(user.tenantId, user.sub, user.role, pipelineId, stageId);
+    return this.dealsService.findAll(user.tenantId, user.sub, user.role, pipelineId, stageId, ownerId);
   }
 
   @Get(':id')

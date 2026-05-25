@@ -6,6 +6,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { DealsService } from '../../../core/services/deals.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { UsersService, TenantUser } from '../../../core/services/users.service';
 import { Deal, KanbanBoard, KanbanStage, Pipeline } from '../../../core/models/deal.models';
 
 @Component({ standalone: false,
@@ -24,16 +25,31 @@ export class KanbanBoardComponent implements OnInit {
 
   showPipelineSettings = false;
 
+  users: TenantUser[] = [];
+  selectedOwnerId = '';
+
   constructor(
     private readonly dealsService: DealsService,
     private readonly authService: AuthService,
+    private readonly usersService: UsersService,
   ) {}
 
   get isAdmin(): boolean {
     return this.authService.currentUser?.role === 'ADMIN';
   }
 
+  get canFilter(): boolean {
+    const role = this.authService.currentUser?.role;
+    return role === 'ADMIN' || role === 'MANAGER';
+  }
+
   ngOnInit(): void {
+    if (this.canFilter) {
+      this.usersService.list().subscribe({
+        next: (users) => (this.users = users.filter((u) => u.isActive)),
+      });
+    }
+
     this.dealsService.listPipelines().subscribe({
       next: (pipelines) => {
         this.pipelines = pipelines;
@@ -51,13 +67,21 @@ export class KanbanBoardComponent implements OnInit {
 
   loadBoard(pipelineId: string): void {
     this.loading = true;
-    this.dealsService.getKanban(pipelineId).subscribe({
+    const ownerId = this.selectedOwnerId || undefined;
+    this.dealsService.getKanban(pipelineId, ownerId).subscribe({
       next: (board) => {
         this.board = board;
         this.loading = false;
       },
       error: () => (this.loading = false),
     });
+  }
+
+  onOwnerChange(ownerId: string): void {
+    this.selectedOwnerId = ownerId;
+    if (this.selectedPipelineId) {
+      this.loadBoard(this.selectedPipelineId);
+    }
   }
 
   onPipelineChange(pipelineId: string): void {
