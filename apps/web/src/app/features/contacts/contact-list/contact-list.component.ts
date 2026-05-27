@@ -14,6 +14,7 @@ export class ContactListComponent implements OnInit {
   search = '';
   statusFilter = '';
   private searchSubject = new Subject<string>();
+  Math = Math;
 
   constructor(private readonly contactsService: ContactsService) {}
 
@@ -72,6 +73,17 @@ export class ContactListComponent implements OnInit {
       LOST: 'badge-red',
     };
     return map[status] ?? 'badge-gray';
+  }
+
+  getStatusBadgeClasses(status: string): string {
+    const map: Record<string, string> = {
+      LEAD: 'bg-surface-container-high text-primary border-primary/20',
+      QUALIFIED: 'bg-secondary-container/20 text-secondary border-secondary/20',
+      CUSTOMER: 'bg-[#16a34a]/20 text-[#16a34a] border-[#16a34a]/20',
+      CHURNED: 'bg-error-container/20 text-error border-error/20',
+      LOST: 'bg-error-container/20 text-error border-error/20',
+    };
+    return map[status] ?? 'bg-surface-container-high text-primary border-primary/20';
   }
 
   getStatusLabel(status: string): string {

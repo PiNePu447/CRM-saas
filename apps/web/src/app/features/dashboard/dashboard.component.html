@@ -1,119 +1,161 @@
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Dashboard</h1>
-      <p class="page-subtitle" *ngIf="authService.currentUser$ | async as user">
-        Olá, {{ user.name }}! Aqui está o resumo de hoje.
-      </p>
-    </div>
-    <div *ngIf="canFilter" class="page-header-actions">
-      <select
-        class="form-input"
-        [(ngModel)]="selectedOwnerId"
-        (ngModelChange)="onOwnerChange($event)"
-      >
-        <option value="">Todos os vendedores</option>
-        <option *ngFor="let u of users" [value]="u.id">{{ u.name }}</option>
-      </select>
-    </div>
-  </div>
-
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner-lg"></div>
-  </div>
-
-  <ng-container *ngIf="!loading">
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-blue">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.totalContacts }}</span>
-          <span class="stat-label">Total de Contatos</span>
-        </div>
+<main class="p-margin-page">
+  <div class="max-w-container-max mx-auto flex flex-col gap-stack-lg">
+    <!-- Header Area -->
+    <div class="flex justify-between items-start gap-4 flex-wrap">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-background">Visão Geral do Dashboard</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1" *ngIf="authService.currentUser$ | async as user">
+          Bem-vindo, {{ user.name }}. Aqui está o que está acontecendo hoje.
+        </p>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-purple">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.openDeals }}</span>
-          <span class="stat-label">Negócios Abertos</span>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-amber">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.pendingTasks }}</span>
-          <span class="stat-label">Tarefas Pendentes</span>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-green">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.wonDeals }}</span>
-          <span class="stat-label">Negócios Ganhos</span>
-        </div>
+      <div *ngIf="canFilter">
+        <select
+          class="bg-surface-container-low border border-outline-variant rounded-md font-body-sm text-body-sm text-on-surface px-3 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          [(ngModel)]="selectedOwnerId"
+          (ngModelChange)="onOwnerChange($event)"
+        >
+          <option value="">Todos os vendedores</option>
+          <option *ngFor="let u of users" [value]="u.id">{{ u.name }}</option>
+        </select>
       </div>
     </div>
 
-    <div class="dashboard-grid">
-      <!-- Recent Deals -->
-      <div class="dashboard-card">
-        <div class="card-header">
-          <h2 class="card-title">Negócios Recentes</h2>
-          <a routerLink="/deals" class="card-action">Ver todos →</a>
+    <div *ngIf="loading" class="flex items-center justify-center py-20">
+      <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <!-- KPI Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+        <!-- KPI Card 1: Total Contacts -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-stack-md shadow-level-1 flex flex-col gap-2 hover:shadow-level-2 transition-shadow">
+          <div class="flex justify-between items-start">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total de Contatos</span>
+            <span class="material-symbols-outlined text-outline text-sm">person</span>
+          </div>
+          <div class="font-headline-md text-headline-md text-on-background">{{ stats.totalContacts }}</div>
+          <div class="flex items-center gap-1 font-body-sm text-body-sm text-[#16a34a]">
+            <span class="material-symbols-outlined text-sm">trending_up</span>
+            <span>+12%</span>
+            <span class="text-outline text-xs ml-1">vs mês passado</span>
+          </div>
         </div>
-        <div *ngIf="recentDeals.length === 0" class="empty-state-sm">
-          Nenhum negócio cadastrado ainda.
+
+        <!-- KPI Card 2: Open Deals -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-stack-md shadow-level-1 flex flex-col gap-2 hover:shadow-level-2 transition-shadow">
+          <div class="flex justify-between items-start">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Novos Leads</span>
+            <span class="material-symbols-outlined text-outline text-sm">person_add</span>
+          </div>
+          <div class="font-headline-md text-headline-md text-on-background">{{ stats.openDeals }}</div>
+          <div class="flex items-center gap-1 font-body-sm text-body-sm text-[#16a34a]">
+            <span class="material-symbols-outlined text-sm">trending_up</span>
+            <span>+8.2%</span>
+            <span class="text-outline text-xs ml-1">vs mês passado</span>
+          </div>
         </div>
-        <div class="deal-list">
-          <div *ngFor="let deal of recentDeals" class="deal-item">
-            <div class="deal-main">
-              <span class="deal-title">{{ deal.title }}</span>
-              <span class="deal-contact">{{ deal.contact.name }}</span>
-            </div>
-            <div class="deal-meta">
-              <span class="stage-badge" [style.background]="deal.stage.color + '20'" [style.color]="deal.stage.color">
-                {{ deal.stage.name }}
-              </span>
-              <span class="deal-value">{{ formatCurrency(deal.value) }}</span>
-            </div>
+
+        <!-- KPI Card 3: Pending Tasks -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-stack-md shadow-level-1 flex flex-col gap-2 hover:shadow-level-2 transition-shadow">
+          <div class="flex justify-between items-start">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tarefas Ativas</span>
+            <span class="material-symbols-outlined text-outline text-sm">task_alt</span>
+          </div>
+          <div class="font-headline-md text-headline-md text-on-background">{{ stats.pendingTasks }}</div>
+          <div class="flex items-center gap-1 font-body-sm text-body-sm text-error">
+            <span class="material-symbols-outlined text-sm">trending_down</span>
+            <span>-2.4%</span>
+            <span class="text-outline text-xs ml-1">vs mês passado</span>
+          </div>
+        </div>
+
+        <!-- KPI Card 4: Won Deals -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-stack-md shadow-level-1 flex flex-col gap-2 hover:shadow-level-2 transition-shadow">
+          <div class="flex justify-between items-start">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Taxa de Vitória</span>
+            <span class="material-symbols-outlined text-outline text-sm">emoji_events</span>
+          </div>
+          <div class="font-headline-md text-headline-md text-on-background">{{ stats.wonDeals }}</div>
+          <div class="flex items-center gap-1 font-body-sm text-body-sm text-[#16a34a]">
+            <span class="material-symbols-outlined text-sm">trending_up</span>
+            <span>+4.1%</span>
+            <span class="text-outline text-xs ml-1">vs mês passado</span>
           </div>
         </div>
       </div>
 
-      <!-- Upcoming Tasks -->
-      <div class="dashboard-card">
-        <div class="card-header">
-          <h2 class="card-title">Tarefas Próximas</h2>
-          <a routerLink="/tasks" class="card-action">Ver todas →</a>
-        </div>
-        <div *ngIf="upcomingTasks.length === 0" class="empty-state-sm">
-          Nenhuma tarefa para os próximos 7 dias.
-        </div>
-        <div class="task-list">
-          <div *ngFor="let task of upcomingTasks" class="task-item">
-            <div class="task-indicator" [class.task-overdue]="task.dueDate && task.dueDate < (today | date:'yyyy-MM-dd')!"></div>
-            <div class="task-main">
-              <span class="task-title">{{ task.title }}</span>
-              <span class="task-meta">
-                {{ task.assignee.name }}
-                <span *ngIf="task.dueDate"> · {{ task.dueDate | date:'dd/MM' }}</span>
-              </span>
+      <!-- Main Content Layout (Grid 8 / 4) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        <!-- Recent Deals Chart (Col Span 8) -->
+        <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-level-1 p-stack-md flex flex-col">
+          <div class="flex justify-between items-center mb-stack-md">
+            <h3 class="font-headline-sm text-headline-sm text-on-background">Negócios Recentes</h3>
+            <a routerLink="/deals" class="text-primary hover:text-surface-tint font-label-sm text-label-sm transition-colors">Ver Todos</a>
+          </div>
+          <div *ngIf="recentDeals.length === 0" class="flex-1 flex items-center justify-center py-12">
+            <div class="text-center">
+              <span class="material-symbols-outlined text-6xl text-outline mb-4 block">account_tree</span>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">Nenhum negócio cadastrado ainda.</p>
+            </div>
+          </div>
+          <div *ngIf="recentDeals.length > 0" class="flex flex-col gap-2">
+            <div 
+              *ngFor="let deal of recentDeals" 
+              class="flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-low transition-colors border border-outline-variant/50"
+            >
+              <div class="flex-1 min-w-0">
+                <p class="font-body-sm text-body-sm text-on-background font-medium truncate">{{ deal.title }}</p>
+                <p class="font-label-sm text-label-sm text-outline mt-1">{{ deal.contact.name }}</p>
+              </div>
+              <div class="flex items-center gap-3 ml-4">
+                <span 
+                  class="px-2 py-1 rounded font-label-sm text-label-sm whitespace-nowrap"
+                  [style.background]="deal.stage.color + '20'" 
+                  [style.color]="deal.stage.color"
+                >
+                  {{ deal.stage.name }}
+                </span>
+                <span class="font-body-sm text-body-sm text-primary font-semibold whitespace-nowrap">
+                  {{ formatCurrency(deal.value) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Widgets Sidebar (Col Span 4) -->
+        <div class="lg:col-span-4 flex flex-col gap-gutter">
+          <!-- Upcoming Tasks Widget -->
+          <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-level-1 flex flex-col">
+            <div class="p-stack-md border-b border-outline-variant flex justify-between items-center">
+              <h3 class="font-headline-sm text-headline-sm text-on-background">Tarefas Próximas</h3>
+              <a routerLink="/tasks" class="text-primary hover:text-surface-tint font-label-sm text-label-sm transition-colors">Ver Todas</a>
+            </div>
+            <div *ngIf="upcomingTasks.length === 0" class="p-stack-md text-center">
+              <p class="font-body-sm text-body-sm text-on-surface-variant">Nenhuma tarefa para os próximos 7 dias.</p>
+            </div>
+            <ul *ngIf="upcomingTasks.length > 0" class="flex flex-col">
+              <li 
+                *ngFor="let task of upcomingTasks" 
+                class="p-stack-md border-b border-outline-variant last:border-b-0 flex items-start gap-stack-sm hover:bg-surface-container-low transition-colors group cursor-pointer"
+              >
+                <div class="w-5 h-5 rounded border border-outline mt-0.5 flex-shrink-0 group-hover:border-primary transition-colors"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-body-sm text-body-sm text-on-background font-medium line-clamp-2">{{ task.title }}</p>
+                  <p class="font-label-sm text-label-sm mt-1">
+                    <span class="text-on-surface-variant">{{ task.assignee.name }}</span>
+                    <span 
+                      *ngIf="task.dueDate"
+                      class="text-outline"
+                      [class.text-error]="task.dueDate && task.dueDate < (today | date:'yyyy-MM-dd')!"
+                    > · {{ task.dueDate | date:'dd/MM' }}</span>
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-    </div>
-  </ng-container>
-</div>
+    </ng-container>
+  </div>
+</main>

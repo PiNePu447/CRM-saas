@@ -1,46 +1,56 @@
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Equipe</h1>
-      <p class="page-subtitle">Gerencie os usuários, gerentes e vendedores do tenant</p>
-    </div>
-    <button *ngIf="canInvite" class="btn-primary" (click)="openCreateModal()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Convidar Usuário
-    </button>
-  </div>
-
-  <div class="filters-bar">
-    <input
-      type="text"
-      class="form-input search-input"
-      placeholder="Buscar por nome ou e-mail..."
-      [(ngModel)]="search"
-      style="max-width: 360px;"
-    />
-  </div>
-
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner-lg"></div>
-  </div>
-
-  <div *ngIf="!loading" class="table-container">
-    <div *ngIf="filteredUsers.length === 0" class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      <p>Nenhum usuário encontrado.</p>
-      <button *ngIf="canInvite" class="btn-primary" style="margin-top:12px" (click)="openCreateModal()">
+<main class="p-margin-page">
+  <div class="max-w-container-max mx-auto flex flex-col gap-stack-lg">
+    <!-- Page Header -->
+    <div class="flex justify-between items-start gap-4 flex-wrap">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-background">Gerenciamento de Equipe</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Gerencie os usuários, gerentes e vendedores do tenant.
+        </p>
+      </div>
+      <button 
+        *ngIf="canInvite"
+        class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+        (click)="openCreateModal()"
+      >
+        <span class="material-symbols-outlined text-lg">person_add</span>
         Convidar Usuário
       </button>
     </div>
 
-    <table *ngIf="filteredUsers.length > 0" class="data-table">
+    <!-- Search Bar -->
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+      <input
+        type="text"
+        class="w-full max-w-md pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+        placeholder="Buscar por nome ou e-mail..."
+        [(ngModel)]="search"
+      />
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex items-center justify-center py-20">
+      <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div *ngIf="!loading" class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+      <div *ngIf="filteredUsers.length === 0" class="flex flex-col items-center justify-center py-16 px-4">
+        <span class="material-symbols-outlined text-6xl text-outline mb-4">group_off</span>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-4">Nenhum usuário encontrado.</p>
+        <button 
+          *ngIf="canInvite"
+          class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+          (click)="openCreateModal()"
+        >
+          <span class="material-symbols-outlined text-lg">person_add</span>
+          Convidar Usuário
+        </button>
+      </div>
+
+      <div *ngIf="filteredUsers.length > 0" class="overflow-x-auto">
+        <table class="w-full text-left border-collapse whitespace-nowrap">
       <thead>
         <tr>
           <th>Usuário</th>

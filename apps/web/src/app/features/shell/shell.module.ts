@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ShellComponent } from './shell.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { TopbarComponent } from './topbar/topbar.component';
 import { AuthGuard } from '../../core/guards/auth.guard';
 
 @NgModule({
-  declarations: [ShellComponent, SidebarComponent],
+  declarations: [ShellComponent, SidebarComponent, TopbarComponent],
   imports: [
     CommonModule,
     RouterModule.forChild([

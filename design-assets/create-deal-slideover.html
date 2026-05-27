@@ -1,0 +1,281 @@
+<!DOCTYPE html><html class="light dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Create New Deal Slide-over - SalesForceX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-dim": "#031427", "on-secondary": "#003640", primary: "#00e0b7", "on-tertiary-container": "#ffd0d2", "tertiary-container": "#bf0f3c", "on-surface-variant": "#c7c4d8", tertiary: "#ffb2b7", "on-tertiary-fixed-variant": "#92002a", error: "#ffb4ab", "outline-variant": "#464555", "on-secondary-fixed-variant": "#004e5d", "on-secondary-fixed": "#001f26", "surface-tint": "#00e0b7", "on-primary-container": "#00f7cb", "error-container": "#93000a", "surface-container": "#102034", "on-secondary-container": "#002e38", "inverse-primary": "#006b57", "secondary-fixed": "#adecff", "on-tertiary-fixed": "#40000d", "surface-container-high": "#1b2b3f", "secondary-container": "#359db4", "on-primary-fixed-variant": "#005141", outline: "#918fa1", "on-tertiary": "#67001b", "on-error": "#690005", "primary-fixed": "#15ffd1", "surface-container-low": "#0b1c30", "primary-fixed-dim": "#00e0b7", "secondary-fixed-dim": "#74d4ed", "surface-variant": "#26364a", "tertiary-fixed": "#ffdadb", secondary: "#74d4ed", "on-surface": "#d3e4fe", surface: "#031427", "inverse-on-surface": "#213145", "on-error-container": "#ffdad6", "on-background": "#d3e4fe", "inverse-surface": "#d3e4fe", "on-primary": "#00382c", "surface-bright": "#2a3a4f", "on-primary-fixed": "#002019", "surface-container-lowest": "#000f21", "primary-container": "#006d58", "surface-container-highest": "#26364a", "tertiary-fixed-dim": "#ffb2b7", background: "#031427"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"container-max": "1440px", "stack-md": "1rem", "stack-sm": "0.5rem", gutter: "1.5rem", "margin-page": "2rem", "sidebar-width": "280px", "stack-lg": "2rem"}, fontFamily: {"body-md": ["Inter"], "display-lg": ["Inter"], "body-sm": ["Inter"], "body-lg": ["Inter"], "display-lg-mobile": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], code: ["jetbrainsMono"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Inter"]}, fontSize: {"body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "display-lg-mobile": ["30px", {lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-md": ["24px", {lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600"}], "label-md": ["14px", {lineHeight: "20px", fontWeight: "500"}], "headline-sm": ["20px", {lineHeight: "28px", fontWeight: "600"}], code: ["14px", {lineHeight: "20px", fontWeight: "400"}]}}}};</script>
+<style>
+        /* Custom scrollbar for panel */
+        .panel-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .panel-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .panel-scroll::-webkit-scrollbar-thumb {
+            background-color: theme('colors.outline-variant');
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex antialiased">
+<!-- Background App Layout (Simulated underlying dashboard) -->
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-[280px] bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-outline flex flex-col py-stack-lg z-10 hidden md:flex">
+<div class="px-gutter mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary font-bold">
+                    S
+                </div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">SalesForceX</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Tier</p>
+</div>
+</div>
+</div>
+<div class="px-gutter mb-6">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create New
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto px-4">
+<ul class="space-y-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+                        Contacts
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+                        Companies
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-surface-container-high dark:bg-secondary-container text-primary dark:text-on-secondary-container border-l-2 border-primary transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+                        Deals
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+                        Tasks
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+<div class="px-4 mt-auto pt-4 border-t border-outline-variant dark:border-outline">
+<ul class="space-y-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                        Help
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                        Logout
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[280px] w-full min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flex justify-between items-center h-16 px-gutter z-10 w-full transition-all duration-200 relative">
+<div class="flex items-center gap-4 flex-1">
+<button class="md:hidden text-on-surface-variant p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="relative max-w-md w-full hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full border border-outline-variant rounded-lg pl-10 pr-4 py-2 font-body-sm text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow text-on-surface bg-surface-container-low" placeholder="Search deals, contacts, or companies..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant flex items-center justify-center text-on-surface-variant dark:text-surface-variant transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant flex items-center justify-center text-on-surface-variant dark:text-surface-variant transition-all duration-200 hidden md:flex">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant flex items-center justify-center text-on-surface-variant dark:text-surface-variant transition-all duration-200 hidden sm:flex">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2 hidden sm:block"></div>
+<button class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-2">
+<img alt="User Profile" data-alt="A close-up headshot of a professional business person in a modern office environment. Soft, diffused natural light illuminates their face, creating a clean, professional aesthetic. The background is slightly blurred, showing hints of a bright, contemporary workspace with cool blue and white tones to match the UI style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4l99W6LRYU7_2_LFyb_OsVszsz5d6F3abvYKiBkgDG815XKcqg5t6N-8Tm7A5lHAvw8yVsEEqhKal3WneX_YfSoUK8RLkAROYUPWWO3RPstjBEIcZAbjPE1Yen9Ku9cOlrCeWr0m21GVUYrdkxOC_GpgvocjK8TF0Da3BKsmSzNIohUtgnXwl8UF6up9SAoTlAyoj1dGbilw02VmDEROFoWSrrsN7VEopn-m_7T8sSnDEfMaH7IEh0PTxwQI-jxb-J7mhhUHFfJU">
+</button>
+</div>
+</header>
+<!-- Simulated Dashboard Canvas (Blurred/Dimmed by Overlay) -->
+<main class="flex-1 p-margin-page bg-background overflow-auto">
+<div class="max-w-[container-max] mx-auto">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">Deals Pipeline</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage and track your active opportunities.</p>
+</div>
+</div>
+<!-- Dummy Kanban Board -->
+<div class="flex gap-6 overflow-x-auto pb-4">
+<div class="min-w-[300px] w-[300px] bg-surface-container-lowest rounded-xl border border-outline-variant p-4">
+<h3 class="font-label-md text-label-md text-on-surface mb-4 pb-2 border-b border-outline-variant flex justify-between">Lead In <span class="text-outline">3</span></h3>
+<div class="space-y-3">
+<div class="bg-surface border border-outline-variant rounded-lg p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+<div class="font-label-md text-label-md text-on-surface mb-1">Acme Corp Enterprise Rollout</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mb-2">Acme Corporation</div>
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-primary">$45,000</span>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] px-2 py-0.5 rounded">Oct 15</span>
+</div>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+<div class="font-label-md text-label-md text-on-surface mb-1">Global Tech Migration</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mb-2">Global Tech</div>
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-primary">$120,000</span>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] px-2 py-0.5 rounded">Nov 01</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- OVERLAY & SLIDE-OVER PANEL -->
+<!-- Semi-transparent overlay -->
+<div aria-hidden="true" class="fixed inset-0 bg-surface-container-lowest/80 backdrop-blur-sm z-40 transition-opacity"></div>
+<!-- Slide-over Panel -->
+<div class="fixed inset-y-0 right-0 z-50 flex w-full max-w-[500px] pl-10 sm:pl-16 shadow-2xl transition-transform duration-300 ease-in-out transform translate-x-0">
+<div class="flex h-full flex-col border-l border-outline-variant shadow-[rgba(0,0,0,0.1)_0px_20px_25px_-5px,rgba(0,0,0,0.04)_0px_10px_10px_-5px] w-full relative bg-surface-container">
+<!-- Panel Header -->
+<div class="flex items-center justify-between border-b border-outline-variant px-6 py-5 bg-surface-container-high">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Create New Deal</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Add a new opportunity to your pipeline.</p>
+</div>
+<button class="rounded-full p-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Panel Content / Form -->
+<div class="flex-1 overflow-y-auto px-6 py-6 panel-scroll bg-surface-container">
+<form class="space-y-6">
+<!-- Deal Name -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="deal-name">Deal Name <span class="text-error">*</span></label>
+<input class="block w-full rounded-lg border border-outline-variant py-2.5 px-3 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_0_2px_rgba(79,70,229,0.2)] transition-all sm:text-sm bg-surface-container-low" id="deal-name" name="deal-name" placeholder="e.g., Enterprise Software License" type="text">
+</div>
+<!-- Company (Select) -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="company">Company <span class="text-error">*</span></label>
+<div class="relative">
+<select class="block w-full appearance-none rounded-lg border border-outline-variant py-2.5 pl-3 pr-10 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_0_2px_rgba(79,70,229,0.2)] transition-all sm:text-sm bg-surface-container-low" id="company" name="company">
+<option disabled="" selected="" value="">Select a company...</option>
+<option value="acme">Acme Corporation</option>
+<option value="globex">Globex Inc.</option>
+<option value="soylent">Soylent Corp</option>
+<option value="initech">Initech</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-symbols-outlined text-outline-variant">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Amount & Currency -->
+<div class="grid grid-cols-3 gap-4">
+<div class="col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="amount">Amount <span class="text-error">*</span></label>
+<div class="relative rounded-lg shadow-sm">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="text-on-surface-variant font-body-md sm:text-sm">$</span>
+</div>
+<input class="block w-full rounded-lg border border-outline-variant py-2.5 pl-7 pr-3 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_0_2px_rgba(79,70,229,0.2)] transition-all sm:text-sm bg-surface-container-low" id="amount" name="amount" placeholder="0.00" type="number">
+</div>
+</div>
+<div class="col-span-1">
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="currency">Currency</label>
+<select class="block w-full rounded-lg border border-outline-variant py-2.5 px-3 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm bg-surface-container-low" id="currency" name="currency">
+<option>USD</option>
+<option>EUR</option>
+<option>GBP</option>
+</select>
+</div>
+</div>
+<!-- Expected Close Date -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="close-date">Expected Close Date</label>
+<div class="relative">
+<input class="block w-full rounded-lg border border-outline-variant py-2.5 px-3 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_0_2px_rgba(79,70,229,0.2)] transition-all sm:text-sm bg-surface-container-low" id="close-date" name="close-date" type="date">
+</div>
+</div>
+<!-- Pipeline Stage -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="pipeline-stage">Pipeline Stage</label>
+<div class="relative">
+<select class="block w-full appearance-none rounded-lg border border-outline-variant py-2.5 pl-3 pr-10 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_0_2px_rgba(79,70,229,0.2)] transition-all sm:text-sm bg-surface-container-low" id="pipeline-stage" name="pipeline-stage">
+<option value="lead">Lead In</option>
+<option value="contact">Contact Made</option>
+<option value="demo">Demo Scheduled</option>
+<option value="proposal">Proposal Sent</option>
+<option value="negotiation">Negotiation</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-symbols-outlined text-outline-variant">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Assignee -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="assignee">Assignee</label>
+<div class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-low">
+<img alt="Current User" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A small circular avatar of a professional business person. Same image as header profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwc9B-FxFRXoBVY9LmXaohaQ0WJC6rK1UoqLPMT3_2TZ87uWgphgQdqDd0ctBKjbNSLNOeUQPWRln_n744I3my9soGjDgRpE_VYgg68GOpyVz_ye6P1IowlnbIlC2Wxl7eH-plLCFTEsHmezpyz-lcKnWpHFAwbgqowbCMF4K-U_guUBigGp5UTmn92XUXT3PrQI1HQ6RpUvfG9xIMatB4rgakF9uCueFetdVp51XQHhMK_I2xE8_GLA5zb5XxCP47lZXvg3WtzIo">
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">You (Default)</p>
+</div>
+<button class="text-primary font-label-sm text-label-sm hover:text-primary-container" type="button">Change</button>
+</div>
+</div>
+<!-- Description -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="description">Description / Notes</label>
+<textarea class="block w-full rounded-lg border border-outline-variant py-2.5 px-3 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_0_2px_rgba(79,70,229,0.2)] transition-all sm:text-sm bg-surface-container-low" id="description" name="description" placeholder="Add any initial context here..." rows="3"></textarea>
+</div>
+</form>
+</div>
+<!-- Panel Footer / Actions -->
+<div class="flex flex-shrink-0 justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-high">
+<button class="rounded-lg bg-surface-container-lowest border border-outline-variant px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-colors" type="button">
+                    Cancel
+                </button>
+<button class="rounded-lg bg-primary px-4 py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-colors flex items-center gap-2" type="submit">
+                    Create Deal
+                </button>
+</div>
+</div>
+</div>
+
+
+</body></html>

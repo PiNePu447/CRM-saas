@@ -24,7 +24,7 @@ export interface Deal {
   closedAt?: string;
   isWon?: boolean;
   closedReason?: string;
-  contact: { id: string; name: string; email?: string };
+  contact: { id: string; name: string; email?: string; company?: { id: string; name: string } };
   owner: { id: string; name: string };
   stage: PipelineStage;
   pipeline: { id: string; name: string };

@@ -1,62 +1,128 @@
-<div class="auth-wrapper">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <rect width="40" height="40" rx="10" fill="#4F46E5"/>
-        <path d="M12 20C12 15.582 15.582 12 20 12C22.21 12 24.21 12.895 25.657 14.343L23.536 16.464C22.629 15.557 21.378 15 20 15C17.239 15 15 17.239 15 20C15 22.761 17.239 25 20 25C21.378 25 22.629 24.443 23.536 23.536L25.657 25.657C24.21 27.105 22.21 28 20 28C15.582 28 12 24.418 12 20Z" fill="white"/>
-        <path d="M24 20H28M28 20L26 18M28 20L26 22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="auth-logo-text">CRM</span>
-    </div>
-
-    <h1 class="auth-title">Entrar na sua conta</h1>
-    <p class="auth-subtitle">Bem-vindo de volta! Digite suas credenciais.</p>
-
-    <div *ngIf="error" class="auth-error">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 4a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0V5zm-.75 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
-      {{ error }}
-    </div>
-
-    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
-      <div class="form-group">
-        <label class="form-label" for="email">E-mail</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="form-input"
-          [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
-          placeholder="seu@email.com"
-          autocomplete="email"
-        />
-        <span *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="input-error-msg">
-          E-mail inválido
-        </span>
+<main class="w-full min-h-screen flex flex-col relative z-10 overflow-hidden bg-background text-on-surface">
+  <div class="w-full flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-16 xl:px-24 bg-surface">
+    <div class="w-full max-w-[440px] flex flex-col">
+      <!-- Brand Header -->
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center shadow-primary-glow">
+            <span class="material-symbols-outlined text-on-primary-container text-xl font-variation-settings-fill">
+              domain
+            </span>
+          </div>
+          <h1 class="font-headline-sm text-headline-sm font-bold tracking-tight text-primary">
+            SalesForceX
+          </h1>
+        </div>
+        <h2 class="font-display-lg text-display-lg text-on-surface mb-2">Bem-vindo de volta</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Digite suas credenciais para acessar sua área de trabalho.</p>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="password">Senha</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          class="form-input"
-          [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched"
-          placeholder="••••••••"
-          autocomplete="current-password"
-        />
+      <!-- Error Message -->
+      <div 
+        *ngIf="error" 
+        class="mb-5 p-4 bg-error-container/10 border border-error/30 rounded-lg flex items-start gap-3"
+      >
+        <span class="material-symbols-outlined text-error text-xl flex-shrink-0">error</span>
+        <span class="font-body-sm text-body-sm text-error">{{ error }}</span>
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="loading || form.invalid">
-        <span *ngIf="!loading">Entrar</span>
-        <span *ngIf="loading" class="btn-loading">
-          <span class="spinner"></span> Entrando...
-        </span>
-      </button>
-    </form>
+      <!-- Login Form -->
+      <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-5">
+        <!-- Email Input -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label-sm text-label-sm text-on-surface-variant" for="email">E-mail</label>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors text-xl">
+              mail
+            </span>
+            <input 
+              id="email"
+              type="email"
+              formControlName="email"
+              class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-4 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all shadow-inner"
+              [class.border-error]="form.get('email')?.invalid && form.get('email')?.touched"
+              placeholder="nome@empresa.com"
+              autocomplete="email"
+            />
+          </div>
+          <span 
+            *ngIf="form.get('email')?.invalid && form.get('email')?.touched" 
+            class="font-label-sm text-label-sm text-error"
+          >
+            E-mail inválido
+          </span>
+        </div>
 
-    <p class="auth-footer">
-      Acesso restrito. Entre em contato com o administrador para obter acesso.
-    </p>
+        <!-- Password Input -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label-sm text-label-sm text-on-surface-variant" for="password">Senha</label>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors text-xl">
+              lock
+            </span>
+            <input 
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-10 pr-10 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all shadow-inner"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <button 
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+            >
+              <span class="material-symbols-outlined text-xl">
+                {{ showPassword ? 'visibility' : 'visibility_off' }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Options Row -->
+        <div class="flex items-center justify-between mt-1 mb-2">
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <input 
+              type="checkbox"
+              class="w-4 h-4 rounded border-outline-variant bg-surface-container-lowest text-primary-container focus:ring-primary-container focus:ring-offset-surface"
+            />
+            <span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors">Lembrar-me</span>
+          </label>
+          <a 
+            href="#" 
+            (click)="$event.preventDefault()"
+            class="font-label-md text-label-md text-primary-container hover:text-surface-tint transition-colors hover:underline underline-offset-4"
+          >
+            Esqueceu a senha?
+          </a>
+        </div>
+
+        <!-- Primary Action -->
+        <button 
+          type="submit"
+          [disabled]="loading || form.invalid"
+          class="w-full bg-primary-container text-on-primary-container font-label-md text-label-md py-3.5 rounded-lg font-semibold hover:brightness-110 active:scale-[0.98] transition-all shadow-primary-glow-lg flex justify-center items-center gap-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100"
+        >
+          <span *ngIf="!loading" class="flex items-center gap-2">
+            Entrar
+            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+          </span>
+          <span *ngIf="loading" class="flex items-center gap-2">
+            <span class="inline-block w-4 h-4 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin"></span>
+            Entrando...
+          </span>
+        </button>
+      </form>
+
+      <!-- Footer Text -->
+      <div class="mt-12 text-center">
+        <p class="font-body-sm text-body-sm text-outline">
+          Ao entrar, você concorda com nossos 
+          <a href="#" class="text-on-surface-variant hover:text-on-surface hover:underline" (click)="$event.preventDefault()">Termos de Serviço</a> e 
+          <a href="#" class="text-on-surface-variant hover:text-on-surface hover:underline" (click)="$event.preventDefault()">Política de Privacidade</a>.
+        </p>
+      </div>
+    </div>
   </div>
-</div>
+</main>

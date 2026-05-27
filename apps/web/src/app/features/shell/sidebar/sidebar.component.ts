@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface NavItem {
@@ -17,19 +18,26 @@ export class SidebarComponent {
   @Output() closed = new EventEmitter<void>();
 
   private readonly allNavItems: NavItem[] = [
-    { label: 'Dashboard', route: '/dashboard', icon: 'grid' },
-    { label: 'Contatos', route: '/contacts', icon: 'users' },
-    { label: 'Empresas', route: '/companies', icon: 'building' },
-    { label: 'Negócios', route: '/deals', icon: 'trending-up' },
-    { label: 'Tarefas', route: '/tasks', icon: 'check-square' },
-    { label: 'Equipe', route: '/team', icon: 'team', roles: ['ADMIN', 'MANAGER'] },
+    { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
+    { label: 'Contatos', route: '/contacts', icon: 'person' },
+    { label: 'Empresas', route: '/companies', icon: 'domain' },
+    { label: 'Negócios', route: '/deals', icon: 'account_tree' },
+    { label: 'Tarefas', route: '/tasks', icon: 'task_alt' },
+    { label: 'Equipe', route: '/team', icon: 'groups' , roles: ['ADMIN', 'MANAGER'] },
   ];
 
-  constructor(readonly authService: AuthService) {}
+  constructor(
+    readonly authService: AuthService,
+    private router: Router
+  ) {}
 
   get navItems(): NavItem[] {
     const role = this.authService.currentUser?.role ?? '';
     return this.allNavItems.filter((item) => !item.roles || item.roles.includes(role));
+  }
+
+  isActive(route: string): boolean {
+    return this.router.url.startsWith(route);
   }
 
   onNavClick(): void {

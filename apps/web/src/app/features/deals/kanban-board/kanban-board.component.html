@@ -1,120 +1,146 @@
-<div class="page page-full">
-  <div class="page-header">
-    <h1 class="page-title">Negócios</h1>
-    <div class="page-header-actions">
-      <select
-        *ngIf="canFilter"
-        class="form-input"
-        [(ngModel)]="selectedOwnerId"
-        (ngModelChange)="onOwnerChange($event)"
-      >
-        <option value="">Todos os vendedores</option>
-        <option *ngFor="let u of users" [value]="u.id">{{ u.name }}</option>
-      </select>
-      <select
-        *ngIf="pipelines.length > 1"
-        class="form-input pipeline-select"
-        [value]="selectedPipelineId"
-        (change)="onPipelineChange($any($event.target).value)"
-      >
-        <option *ngFor="let p of pipelines" [value]="p.id">{{ p.name }}</option>
-      </select>
-      <button *ngIf="isAdmin" class="btn-ghost" (click)="openPipelineSettings()" title="Configurar pipeline">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Pipeline
-      </button>
-      <button class="btn-primary" (click)="openNewDeal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Novo Negócio
-      </button>
-    </div>
-  </div>
-
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner-lg"></div>
-  </div>
-
-  <!-- Empty state when there are no pipelines at all -->
-  <div *ngIf="!loading && !board && pipelines.length === 0" class="empty-state">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray-300)"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-    <p>Nenhum pipeline configurado</p>
-    <button *ngIf="isAdmin" class="btn-primary" (click)="openPipelineSettings()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Criar Pipeline
-    </button>
-    <p *ngIf="!isAdmin" style="font-size:13px;color:var(--gray-400)">Solicite ao administrador que configure o pipeline.</p>
-  </div>
-
-  <div *ngIf="!loading && board" class="kanban-board" cdkDropListGroup>
-    <div
-      *ngFor="let stage of board.stages"
-      class="kanban-column"
-      [id]="stage.id"
-      cdkDropList
-      [cdkDropListData]="stage.deals"
-      [cdkDropListConnectedTo]="getStageConnectedList(stage.id)"
-      (cdkDropListDropped)="onDrop($event, stage)"
-    >
-      <!-- Column Header -->
-      <div class="kanban-column-header">
-        <div class="column-title-row">
-          <div class="column-dot" [style.background]="stage.color"></div>
-          <span class="column-title">{{ stage.name }}</span>
-          <span class="column-count">{{ stage.deals.length }}</span>
-        </div>
-        <span class="column-total" *ngIf="stage.totalValue > 0">
-          {{ formatTotalValue(stage.totalValue) }}
-        </span>
+<main class="flex flex-col h-[calc(100vh-4rem)] overflow-hidden p-margin-page">
+  <div class="max-w-container-max mx-auto flex flex-col gap-stack-lg w-full flex-1 overflow-hidden">
+    <!-- Header Area -->
+    <div class="flex justify-between items-start gap-4 flex-wrap flex-shrink-0">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-background">Pipeline de Negócios</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Gerencie seus negócios em andamento.
+        </p>
       </div>
-
-      <!-- Deal Cards -->
-      <div class="kanban-cards">
-        <div
-          *ngFor="let deal of stage.deals"
-          class="kanban-card"
-          cdkDrag
-          [cdkDragData]="deal"
+      <div class="flex gap-3 flex-wrap">
+        <select
+          *ngIf="canFilter"
+          class="px-3 py-2 bg-surface-container-low border border-outline-variant rounded-md font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          [(ngModel)]="selectedOwnerId"
+          (ngModelChange)="onOwnerChange($event)"
         >
-          <div class="card-drag-handle" cdkDragHandle>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </div>
+          <option value="">Todos os vendedores</option>
+          <option *ngFor="let u of users" [value]="u.id">{{ u.name }}</option>
+        </select>
+        <select
+          *ngIf="pipelines.length > 1"
+          class="px-3 py-2 bg-surface-container-low border border-outline-variant rounded-md font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          [value]="selectedPipelineId"
+          (change)="onPipelineChange($any($event.target).value)"
+        >
+          <option *ngFor="let p of pipelines" [value]="p.id">{{ p.name }}</option>
+        </select>
+        <button 
+          *ngIf="isAdmin" 
+          class="px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-2"
+          (click)="openPipelineSettings()" 
+          title="Configurar pipeline"
+        >
+          <span class="material-symbols-outlined text-lg">settings</span>
+          Pipeline
+        </button>
+        <button 
+          class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+          (click)="openNewDeal()"
+        >
+          <span class="material-symbols-outlined text-lg">add</span>
+          Novo Negócio
+        </button>
+      </div>
+    </div>
 
-          <div class="card-content" (click)="openEditDeal(deal)" style="cursor:pointer">
-            <p class="card-title">{{ deal.title }}</p>
-            <div class="card-contact">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              {{ deal.contact.name }}
+    <div *ngIf="loading" class="flex items-center justify-center flex-1">
+      <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && !board && pipelines.length === 0" class="flex flex-col items-center justify-center flex-1 py-16">
+      <span class="material-symbols-outlined text-6xl text-outline mb-4">account_tree</span>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Nenhum pipeline configurado</p>
+      <button 
+        *ngIf="isAdmin" 
+        class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+        (click)="openPipelineSettings()"
+      >
+        <span class="material-symbols-outlined text-lg">add</span>
+        Criar Pipeline
+      </button>
+      <p *ngIf="!isAdmin" class="font-body-sm text-body-sm text-outline mt-2">
+        Solicite ao administrador que configure o pipeline.
+      </p>
+    </div>
+
+    <!-- Kanban Board -->
+    <div *ngIf="!loading && board" class="flex-1 overflow-x-auto overflow-y-hidden flex gap-stack-lg pb-4" cdkDropListGroup>
+      <div
+        *ngFor="let stage of board.stages"
+        class="flex-shrink-0 w-[320px] flex flex-col h-full bg-surface-container-low rounded-xl border border-outline-variant/50"
+        [id]="stage.id"
+        cdkDropList
+        [cdkDropListData]="stage.deals"
+        [cdkDropListConnectedTo]="getStageConnectedList(stage.id)"
+        (cdkDropListDropped)="onDrop($event, stage)"
+      >
+        <!-- Column Header -->
+        <div class="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-high/30 rounded-t-xl flex-shrink-0">
+          <h3 class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full" [style.background]="stage.color"></span>
+            {{ stage.name }}
+          </h3>
+          <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-full">
+            {{ stage.deals.length }}
+          </span>
+        </div>
+
+        <!-- Deal Cards -->
+        <div class="p-3 overflow-y-auto flex-1 flex flex-col gap-3">
+          <div
+            *ngFor="let deal of stage.deals"
+            class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 cursor-pointer hover:shadow-level-2 transition-all duration-200 group"
+            cdkDrag
+            [cdkDragData]="deal"
+            (click)="openEditDeal(deal)"
+          >
+            <div class="flex justify-between items-start mb-3">
+              <span class="font-label-sm text-label-sm px-2 py-1 bg-surface-variant text-on-surface-variant rounded">
+                {{ deal.contact.company?.name || deal.contact.name }}
+              </span>
+              <button class="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">
+                <span class="material-symbols-outlined text-base">more_horiz</span>
+              </button>
             </div>
-          </div>
-
-          <div class="card-footer">
-            <span *ngIf="deal.value" class="card-value">{{ formatCurrency(deal.value) }}</span>
-            <span *ngIf="deal.expectedCloseDate" class="card-date">
-              {{ deal.expectedCloseDate | date:'dd/MM' }}
-            </span>
-            <div class="card-owner" [title]="deal.owner.name">
-              {{ deal.owner.name.charAt(0) }}
+            <h4 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-2">{{ deal.title }}</h4>
+            <div class="font-label-md text-label-md text-primary mb-4" *ngIf="deal.value">
+              {{ formatCurrency(deal.value) }}
             </div>
+            <div class="flex justify-between items-center border-t border-outline-variant/30 pt-3">
+              <span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1" *ngIf="deal.expectedCloseDate">
+                <span class="material-symbols-outlined text-sm">calendar_today</span>
+                {{ deal.expectedCloseDate | date:'dd/MM' }}
+              </span>
+              <div class="w-6 h-6 rounded-full bg-primary-container/20 border border-primary/30 flex items-center justify-center font-label-sm text-primary" [title]="deal.owner.name">
+                {{ deal.owner.name.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+
+            <!-- Drag preview placeholder -->
+            <div *cdkDragPlaceholder class="opacity-50 bg-surface-container border-2 border-dashed border-primary rounded-lg h-full"></div>
           </div>
 
-          <!-- Drag preview placeholder -->
-          <div *cdkDragPlaceholder class="kanban-card-placeholder"></div>
+          <!-- Add deal button -->
+          <button 
+            class="p-3 border-2 border-dashed border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:border-primary transition-all flex items-center justify-center gap-2 font-label-md text-label-md flex-shrink-0"
+            (click)="openNewDeal(stage.id); $event.stopPropagation()"
+          >
+            <span class="material-symbols-outlined text-base">add</span>
+            Adicionar
+          </button>
         </div>
       </div>
 
-      <!-- Add deal button -->
-      <button class="kanban-add-btn" (click)="openNewDeal(stage.id)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Adicionar
-      </button>
-    </div>
-
-    <!-- Empty board state -->
-    <div *ngIf="board.stages.length === 0" class="empty-state">
-      <p>Configure seu pipeline para começar.</p>
+      <!-- Empty board state -->
+      <div *ngIf="board.stages.length === 0" class="flex flex-col items-center justify-center flex-1 py-16">
+        <p class="font-body-md text-body-md text-on-surface-variant">Configure seu pipeline para começar.</p>
+      </div>
     </div>
   </div>
-</div>
+</main>
 
 <!-- Deal Form Modal -->
 <app-deal-form

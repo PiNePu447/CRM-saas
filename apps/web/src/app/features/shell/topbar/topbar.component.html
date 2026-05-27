@@ -1,0 +1,37 @@
+<header class="hidden lg:block fixed top-0 left-[280px] right-0 h-16 bg-surface border-b border-outline-variant z-30">
+  <div class="h-full max-w-container-max mx-auto px-gutter flex justify-between items-center">
+    <!-- Search Bar -->
+    <div class="relative w-64">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+      <input 
+        type="text" 
+        placeholder="Buscar..." 
+        class="w-full pl-9 pr-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+      >
+    </div>
+    
+    <!-- Trailing Actions & Profile -->
+    <div class="flex items-center gap-stack-sm">
+      <button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200" title="Notificações">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+      <button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200" title="Ajuda">
+        <span class="material-symbols-outlined">help</span>
+      </button>
+      <button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200" title="Apps">
+        <span class="material-symbols-outlined">apps</span>
+      </button>
+      
+      <!-- User Avatar -->
+      <div 
+        *ngIf="authService.currentUser$ | async as user"
+        class="w-8 h-8 rounded-full bg-primary-container ml-2 border border-outline-variant cursor-pointer flex items-center justify-center hover:ring-2 hover:ring-primary/30 transition-all"
+        title="{{ user.name }}"
+      >
+        <span class="text-on-primary-container font-medium text-sm">
+          {{ user.name.charAt(0).toUpperCase() }}
+        </span>
+      </div>
+    </div>
+  </div>
+</header>

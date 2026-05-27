@@ -1,8 +1,55 @@
 /* =============================================
-   CRM — Global Design System
+   CRM — Global Design System (Stitch + Tailwind)
    ============================================= */
 
-/* CSS Variables */
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Symbols Icon Font */
+@layer base {
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .font-variation-settings-fill {
+    font-variation-settings: 'FILL' 1;
+  }
+
+  /* Custom Scrollbar for Dark Theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: theme('colors.surface');
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.surface-variant');
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.outline');
+  }
+}
+
+/* Legacy CSS Variables (will be phased out) */
 :root {
   --color-primary: #4F46E5;
   --color-primary-dark: #3730A3;

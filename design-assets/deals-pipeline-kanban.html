@@ -1,0 +1,324 @@
+<!DOCTYPE html><html class="light dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Deals Pipeline - SalesForceX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-dim": "#031427", "on-secondary": "#003640", primary: "#00e0b7", "on-tertiary-container": "#ffd0d2", "tertiary-container": "#bf0f3c", "on-surface-variant": "#c7c4d8", tertiary: "#ffb2b7", "on-tertiary-fixed-variant": "#92002a", error: "#ffb4ab", "outline-variant": "#464555", "on-secondary-fixed-variant": "#004e5d", "on-secondary-fixed": "#001f26", "surface-tint": "#00e0b7", "on-primary-container": "#00f7cb", "error-container": "#93000a", "surface-container": "#102034", "on-secondary-container": "#002e38", "inverse-primary": "#006b57", "secondary-fixed": "#adecff", "on-tertiary-fixed": "#40000d", "surface-container-high": "#1b2b3f", "secondary-container": "#359db4", "on-primary-fixed-variant": "#005141", outline: "#918fa1", "on-tertiary": "#67001b", "on-error": "#690005", "primary-fixed": "#15ffd1", "surface-container-low": "#0b1c30", "primary-fixed-dim": "#00e0b7", "secondary-fixed-dim": "#74d4ed", "surface-variant": "#26364a", "tertiary-fixed": "#ffdadb", secondary: "#74d4ed", "on-surface": "#d3e4fe", surface: "#031427", "inverse-on-surface": "#213145", "on-error-container": "#ffdad6", "on-background": "#d3e4fe", "inverse-surface": "#d3e4fe", "on-primary": "#00382c", "surface-bright": "#2a3a4f", "on-primary-fixed": "#002019", "surface-container-lowest": "#000f21", "primary-container": "#006d58", "surface-container-highest": "#26364a", "tertiary-fixed-dim": "#ffb2b7", background: "#031427"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"container-max": "1440px", "stack-md": "1rem", "stack-sm": "0.5rem", gutter: "1.5rem", "margin-page": "2rem", "sidebar-width": "280px", "stack-lg": "2rem"}, fontFamily: {"body-md": ["Inter"], "display-lg": ["Inter"], "body-sm": ["Inter"], "body-lg": ["Inter"], "display-lg-mobile": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], code: ["jetbrainsMono"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Inter"]}, fontSize: {"body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}], "display-lg-mobile": ["30px", {lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700"}], "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}], "headline-md": ["24px", {lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600"}], "label-md": ["14px", {lineHeight: "20px", fontWeight: "500"}], "headline-sm": ["20px", {lineHeight: "28px", fontWeight: "600"}], code: ["14px", {lineHeight: "20px", fontWeight: "400"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom scrollbar for Kanban board */
+        .kanban-scroll::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .kanban-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .kanban-scroll::-webkit-scrollbar-thumb {
+            background-color: #c7c4d8; /* outline-variant */
+            border-radius: 4px;
+        }
+        .kanban-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: #777587; /* outline */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-hidden flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col py-stack-lg z-20">
+<!-- Header -->
+<div class="px-gutter mb-stack-lg flex items-center gap-stack-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined fill text-[20px]">domain</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary">SalesForceX</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Tier</p>
+</div>
+</div>
+<!-- Create CTA -->
+<div class="px-gutter mb-stack-lg">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create New
+            </button>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto px-stack-sm">
+<ul class="flex flex-col gap-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+                        Contacts
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+                        Companies
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm bg-surface-container-high text-primary border-l-2 border-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined fill text-[20px]">account_tree</span>
+                        Deals
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+                        Tasks
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</nav>
+<!-- Footer Navigation -->
+<div class="px-stack-sm mt-auto pt-stack-lg">
+<ul class="flex flex-col gap-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                        Help
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                        Logout
+                    </a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col ml-[280px] h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-gutter flex-shrink-0 z-10">
+<!-- Search (Left) -->
+<div class="flex-1 max-w-md">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="Search deals..." type="text">
+</div>
+</div>
+<!-- Actions (Right) -->
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md text-label-md cursor-pointer border border-outline-variant">
+                    US
+                </div>
+</div>
+</header>
+<!-- Kanban Canvas -->
+<main class="flex-1 overflow-hidden flex flex-col p-margin-page bg-surface-bright">
+<!-- Header/Filters Area -->
+<div class="flex justify-between items-end mb-stack-lg flex-shrink-0">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-1">Q3 Enterprise Pipeline</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Showing all active deals for the current quarter.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface flex items-center gap-2 hover:bg-surface-variant transition-colors duration-200">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filters
+                    </button>
+<button class="px-4 py-2 bg-surface-container rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface flex items-center gap-2 hover:bg-surface-variant transition-colors duration-200">
+<span class="material-symbols-outlined text-[18px]">sort</span>
+                        Sort
+                    </button>
+</div>
+</div>
+<!-- Scrollable Board -->
+<div class="flex-1 overflow-x-auto overflow-y-hidden kanban-scroll flex gap-stack-lg pb-4">
+<!-- Column: Lead -->
+<div class="flex-shrink-0 w-[320px] flex flex-col h-full bg-surface-container-low rounded-xl border border-outline-variant/50">
+<div class="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-high/30 rounded-t-xl">
+<h3 class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+                            Lead
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-full">3</span>
+</div>
+<div class="p-3 overflow-y-auto flex-1 flex flex-col gap-3 kanban-scroll">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-200 group">
+<div class="flex justify-between items-start mb-3">
+<span class="font-label-sm text-label-sm px-2 py-1 bg-surface-variant text-on-surface-variant rounded">TechCorp Inc.</span>
+<button class="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-2">Initial Software Assessment</h4>
+<div class="font-label-md text-label-md text-primary mb-4">$12,500</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                    Oct 15
+                                </span>
+<img alt="A professional headshot of a business woman with dark hair, smiling slightly, set against a neutral grey background. The lighting is soft and even, typical of corporate profile photos." class="w-6 h-6 rounded-full border border-outline-variant" data-alt="A professional headshot of a business woman with dark hair, smiling slightly, set against a neutral grey background. The lighting is soft and even, typical of corporate profile photos." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApL--WU53v6x1QZT9Fpf64x0cnzbsC5xITC3ZsWkqeVGO-ophtkUubROCnDx1R3uaiImmS632YRHnOYo4-ncdtmIGuRuxONENSo8xIFq_sVzmzNoEY-ExTo1zadc05-OJaiTTVlan9cVuqwpfMc0eAIrQV9Jh7WF1QFaiHoxxaOCSRne7x6-E1-cUBwgx0gViOigZyVQ9dxoyNlHgKF9FWNWBxHSC47JMulyx6Y8VpSdICH9dqxE97mD6v41x-G9JoVEbO4nOQpts">
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-200 group">
+<div class="flex justify-between items-start mb-3">
+<span class="font-label-sm text-label-sm px-2 py-1 bg-surface-variant text-on-surface-variant rounded">Global Logistics</span>
+<button class="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-2">Fleet Management Upgrade</h4>
+<div class="font-label-md text-label-md text-primary mb-4">$45,000</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                    Oct 18
+                                </span>
+<img alt="A professional headshot of a man with short brown hair and glasses, wearing a blue shirt. The background is slightly blurred out, focusing on his face in natural lighting." class="w-6 h-6 rounded-full border border-outline-variant" data-alt="A professional headshot of a man with short brown hair and glasses, wearing a blue shirt. The background is slightly blurred out, focusing on his face in natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4gLdS0KuckbBkKUkhu2IQf7wEBOTz8mWEsE3L8iOAAghBK4yqgFXJlKrsv208VclxAtTABrnjUdx8BAyypEk56Z0RBAsqdS1EDyxj8LdHGosS2xxxklB-lwfCmrf7coP1apTEXDs_Zfwdoj7gHvvIgCMUD-a8f1maWd5DeL0h32sd71RAUvUIH8_Ewv0frATmgrHxxowjPzjwBZpQg4Z6IORPCAFjLHdqBwQ4fLSo511H0flFJQ1WsPY_PLQn-7l8w_Da9oMjT34">
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Meeting -->
+<div class="flex-shrink-0 w-[320px] flex flex-col h-full bg-surface-container-low rounded-xl border border-outline-variant/50">
+<div class="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-high/30 rounded-t-xl">
+<h3 class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                            Meeting
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-full">1</span>
+</div>
+<div class="p-3 overflow-y-auto flex-1 flex flex-col gap-3 kanban-scroll">
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-200 group">
+<div class="flex justify-between items-start mb-3">
+<span class="font-label-sm text-label-sm px-2 py-1 bg-surface-variant text-on-surface-variant rounded">Apex Financial</span>
+<button class="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-2">Security Audit &amp; Compliance</h4>
+<div class="font-label-md text-label-md text-primary mb-4">$28,500</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                    Tomorrow
+                                </span>
+<div class="w-6 h-6 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-label-sm text-[10px]">
+                                    JD
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Proposal -->
+<div class="flex-shrink-0 w-[320px] flex flex-col h-full bg-surface-container-low rounded-xl border border-outline-variant/50">
+<div class="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-high/30 rounded-t-xl">
+<h3 class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+                            Proposal
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-full">2</span>
+</div>
+<div class="p-3 overflow-y-auto flex-1 flex flex-col gap-3 kanban-scroll">
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-200 group">
+<div class="flex justify-between items-start mb-3">
+<span class="font-label-sm text-label-sm px-2 py-1 bg-surface-variant text-on-surface-variant rounded">Nexus Health</span>
+<button class="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-2">Patient Portal Implementation</h4>
+<div class="font-label-md text-label-md text-primary mb-4">$85,000</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                    Oct 22
+                                </span>
+<img alt="A professional headshot of a person with curly hair, wearing a white blouse. The image is brightly lit with a clean, modern aesthetic suitable for a corporate directory." class="w-6 h-6 rounded-full border border-outline-variant" data-alt="A professional headshot of a person with curly hair, wearing a white blouse. The image is brightly lit with a clean, modern aesthetic suitable for a corporate directory." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlZow_CzL86tfXNmCvduHsl_Wo1FULi687JUWOhfLbi4X3DYZ_gQHhOx04iY5QZXqdLd54vTcX1aaZIbR8_zSh_8vNHZ4HZJ_ibUT1zRGY0HC1Qx7_9U3G53PbbXWDXyDy4bU7DfzAXWAqWuzlR1AmU5C0aeMsxAgWP32WMKsH5TZoF5OfO8ZaiPwyiJ1AwJLMmmNue7VqG9pf327Ibkg-6ygOzjDn4yJENd7tImsCgE7AcmpuRJmEy5ReKpJixfoB5ojfTYkSRCE">
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Negotiation -->
+<div class="flex-shrink-0 w-[320px] flex flex-col h-full bg-surface-container-low rounded-xl border border-outline-variant/50">
+<div class="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-high/30 rounded-t-xl">
+<h3 class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                            Negotiation
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-full">1</span>
+</div>
+<div class="p-3 overflow-y-auto flex-1 flex flex-col gap-3 kanban-scroll">
+<!-- Card 5 -->
+<div class="bg-surface-container-lowest border-l-2 border-l-tertiary border-y border-r border-outline-variant rounded-lg p-4 cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-200 group">
+<div class="flex justify-between items-start mb-3">
+<span class="font-label-sm text-label-sm px-2 py-1 bg-surface-variant text-on-surface-variant rounded">Stark Industries</span>
+<button class="text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-2">Enterprise Cloud Migration</h4>
+<div class="font-label-md text-label-md text-primary mb-4">$150,000</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-3">
+<span class="font-label-sm text-label-sm text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                    Action Required
+                                </span>
+<div class="w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-sm text-[10px]">
+                                    MR
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Won -->
+<div class="flex-shrink-0 w-[320px] flex flex-col h-full bg-surface-container-low rounded-xl border border-outline-variant/50 opacity-80">
+<div class="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-high/30 rounded-t-xl">
+<h3 class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+                            Won
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-full">0</span>
+</div>
+<div class="p-3 overflow-y-auto flex-1 flex flex-col gap-3 kanban-scroll items-center justify-center text-center">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-outline-variant text-[24px]">emoji_events</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Drop won deals here</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

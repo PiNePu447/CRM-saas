@@ -11,6 +11,7 @@ export class LoginComponent implements OnInit {
   form!: FormGroup;
   loading = false;
   error: string | null = null;
+  showPassword = false;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -25,6 +26,10 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   submit(): void {
