@@ -29,28 +29,28 @@ export class UsersController {
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'List all users in the tenant' })
+  @ApiOperation({ summary: 'List users in the tenant (MANAGER sees only their sellers)' })
   findAll(@CurrentUser() user: CurrentUserData) {
-    return this.usersService.findAll(user.tenantId);
+    return this.usersService.findAll(user.tenantId, user.sub, user.role as UserRole);
   }
 
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Get a user by ID' })
   findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
-    return this.usersService.findOne(id, user.tenantId);
+    return this.usersService.findOne(id, user.tenantId, user.sub, user.role as UserRole);
   }
 
   @Post('invite')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Invite a new user to the tenant' })
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Invite a new user (MANAGER can only create SELLERs)' })
   invite(@CurrentUser() user: CurrentUserData, @Body() dto: InviteUserDto) {
-    return this.usersService.invite(user.tenantId, dto);
+    return this.usersService.invite(user.tenantId, user.sub, user.role as UserRole, dto);
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update a user role or status' })
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Update a user (MANAGER can only edit their own sellers)' })
   update(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserData,
@@ -60,10 +60,26 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Soft-delete a user' })
+  @ApiOperation({ summary: 'Soft-delete a user (MANAGER can only remove their own sellers)' })
   remove(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
-    return this.usersService.remove(id, user.tenantId, user.sub);
+    return this.usersService.remove(id, user.tenantId, user.sub, user.role as UserRole);
+  }
+
+  @Patch(':id/assign-manager')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Assign a seller to a manager (MANAGER can only assign to themselves)' })
+  assignManager(
+    @Param('id') sellerId: string,
+    @CurrentUser() user: CurrentUserData,
+    @Body() body: { managerId: string | null },
+  ) {
+    const managerId =
+      user.role === UserRole.MANAGER
+        ? user.sub
+        : body.managerId;
+
+    return this.usersService.assignSellerToManager(sellerId, managerId, user.tenantId);
   }
 }

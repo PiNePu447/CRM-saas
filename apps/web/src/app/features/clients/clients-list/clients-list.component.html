@@ -62,6 +62,20 @@
               <span *ngIf="company.status" class="badge" [ngClass]="companyStatusClass(company.status)">
                 {{ companyStatusLabel(company.status) }}
               </span>
+              <span *ngIf="company.owner" class="company-owner" title="Vendedor responsável">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                {{ company.owner.name }}
+              </span>
+              <span *ngIf="!company.owner" class="company-owner text-muted" title="Sem vendedor atribuído">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Sem responsável
+              </span>
               <span class="company-count">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>

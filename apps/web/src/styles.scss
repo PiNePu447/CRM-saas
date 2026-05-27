@@ -887,3 +887,34 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
   .auth-card { padding: 24px 16px; }
   .data-table th, .data-table td { padding: 10px 12px; }
 }
+
+/* =====================
+   TEAM MANAGEMENT & SHARED ADDITIONS
+   ===================== */
+.badge-purple { background: #EDE9FE; color: #5B21B6; }
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-name { font-weight: 500; font-size: 14px; color: var(--gray-900); }
+.user-email { font-size: 12px; color: var(--gray-500); }
+.user-manager { font-size: 13px; color: var(--gray-700); }
+.row-inactive td { opacity: 0.55; }
+.row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+.text-muted { color: var(--gray-400); font-size: 12px; }
+.delete-confirm-row td { padding: 0; }
+.company-owner { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-600); }
+
+/* Toggle (checkbox styled as switch) */
+.toggle-label { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--gray-700); }
+.toggle-label input[type="checkbox"] { display: none; }
+.toggle-switch { width: 38px; height: 20px; background: var(--gray-300); border-radius: 20px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+.toggle-switch::after { content: ''; width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; }
+.toggle-label input:checked + .toggle-switch { background: var(--color-primary); }
+.toggle-label input:checked + .toggle-switch::after { transform: translateX(18px); }
+
+/* Input with inline action button (e.g., password show/hide) */
+.input-with-action { position: relative; display: flex; align-items: center; }
+.input-with-action .form-input { flex: 1; padding-right: 40px; }
+.input-action-btn { position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: var(--gray-500); display: flex; align-items: center; padding: 0; }
+.input-action-btn:hover { color: var(--gray-700); }
+
+/* Form hint text */
+.form-hint { font-size: 12px; color: var(--gray-500); margin-top: 4px; }

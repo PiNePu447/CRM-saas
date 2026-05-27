@@ -71,7 +71,7 @@ export class PlatformService {
             email: dto.adminEmail,
             passwordHash,
             name: dto.adminName,
-            role: UserRole.SUPER_ADMIN,
+            role: UserRole.ADMIN,
           },
         },
       },
@@ -114,7 +114,7 @@ export class PlatformService {
         email: dto.email,
         name: dto.name,
         passwordHash,
-        role: UserRole.SUPER_ADMIN,
+        role: UserRole.ADMIN,
       },
       select: { id: true, name: true, email: true, role: true, createdAt: true },
     });

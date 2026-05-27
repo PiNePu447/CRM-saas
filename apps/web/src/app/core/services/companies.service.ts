@@ -5,6 +5,12 @@ import { environment } from '../../../environments/environment';
 
 export type CompanyStatus = 'PROSPECT' | 'ACTIVE' | 'INACTIVE' | 'CHURNED';
 
+export interface CompanyOwner {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface Company {
   id: string;
   name: string;
@@ -12,6 +18,8 @@ export interface Company {
   industry?: string;
   size?: string;
   status?: CompanyStatus;
+  ownerId?: string | null;
+  owner?: CompanyOwner | null;
   _count?: { contacts: number };
 }
 
@@ -40,12 +48,16 @@ export class CompaniesService {
     return this.http.get<CompanyWithContacts>(`${this.api}/${id}`);
   }
 
-  create(data: Partial<Company>): Observable<Company> {
+  create(data: Partial<Company> & { ownerId?: string | null }): Observable<Company> {
     return this.http.post<Company>(this.api, data);
   }
 
-  update(id: string, data: Partial<Company>): Observable<Company> {
+  update(id: string, data: Partial<Company> & { ownerId?: string | null }): Observable<Company> {
     return this.http.patch<Company>(`${this.api}/${id}`, data);
+  }
+
+  assignOwner(id: string, ownerId: string | null): Observable<Company> {
+    return this.http.patch<Company>(`${this.api}/${id}/assign-owner`, { ownerId });
   }
 
   delete(id: string): Observable<void> {

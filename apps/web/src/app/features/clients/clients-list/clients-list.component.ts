@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../../core/services/auth.service';
 import { CompaniesService, Company, CompanyWithContacts } from '../../../core/services/companies.service';
+import { TeamService, TeamUser } from '../../../core/services/team.service';
 
 interface CompanyRow extends Company {
   expanded: boolean;
@@ -23,10 +25,28 @@ export class ClientsListComponent implements OnInit {
   deleteConfirmId: string | null = null;
   deleting = false;
 
-  constructor(private readonly companiesService: CompaniesService) {}
+  sellers: TeamUser[] = [];
+
+  constructor(
+    private readonly companiesService: CompaniesService,
+    private readonly teamService: TeamService,
+    readonly authService: AuthService,
+  ) {}
+
+  get isAdminOrManager(): boolean {
+    const role = this.authService.currentUser?.role;
+    return role === 'ADMIN' || role === 'MANAGER';
+  }
+
+  get currentUserId(): string {
+    return this.authService.currentUser?.id ?? '';
+  }
 
   ngOnInit(): void {
     this.loadCompanies();
+    if (this.isAdminOrManager) {
+      this.teamService.list().subscribe({ next: (users) => { this.sellers = users.filter(u => u.role === 'SELLER' || u.role === 'MANAGER' || u.role === 'ADMIN'); } });
+    }
   }
 
   loadCompanies(): void {

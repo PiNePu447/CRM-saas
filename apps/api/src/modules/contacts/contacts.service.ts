@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -76,7 +77,9 @@ export class ContactsService {
     const contact = await this.prisma.contact.findFirst({
       where: { id, tenantId, deletedAt: null, ...ownerFilter },
       include: {
-        company: true,
+        company: {
+          include: { owner: { select: { id: true, name: true, email: true } } },
+        },
         owner: { select: { id: true, name: true, email: true } },
         tags: { include: { tag: true } },
         deals: {
@@ -102,6 +105,17 @@ export class ContactsService {
   async create(tenantId: string, userId: string, userRole: string, dto: CreateContactDto) {
     const ownerId = dto.ownerId && userRole !== UserRole.SELLER ? dto.ownerId : userId;
     const { tagIds, birthDate, ...data } = dto;
+
+    // SELLER can only create contacts for companies assigned to them
+    if (userRole === UserRole.SELLER && dto.companyId) {
+      const company = await this.prisma.company.findFirst({
+        where: { id: dto.companyId, tenantId, deletedAt: null },
+      });
+      if (!company) throw new NotFoundException(`Company ${dto.companyId} not found`);
+      if (company.ownerId !== userId) {
+        throw new ForbiddenException('Sellers can only add contacts to their own companies');
+      }
+    }
 
     if (dto.email) {
       const existing = await this.prisma.contact.findFirst({

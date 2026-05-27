@@ -17,7 +17,6 @@ datasource db {
 
 enum UserRole {
   PLATFORM_ADMIN
-  SUPER_ADMIN
   ADMIN
   MANAGER
   SELLER
@@ -94,13 +93,19 @@ model User {
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
 
+  managerId    String?   @map("manager_id")
+
   tenant        Tenant?    @relation(fields: [tenantId], references: [id])
+  manager       User?      @relation("ManagerSellers", fields: [managerId], references: [id])
+  sellers       User[]     @relation("ManagerSellers")
   ownedContacts Contact[]  @relation("ContactOwner")
   ownedDeals    Deal[]     @relation("DealOwner")
+  ownedCompanies Company[] @relation("CompanyOwner")
   assignedTasks Task[]     @relation("TaskAssignee")
   activities    Activity[]
 
   @@index([tenantId])
+  @@index([tenantId, managerId])
   @@map("users")
 }
 
@@ -140,6 +145,7 @@ model Contact {
 model Company {
   id           String        @id @default(uuid())
   tenantId     String        @map("tenant_id")
+  ownerId      String?       @map("owner_id")
   name         String
   domain       String?
   industry     String?
@@ -151,10 +157,12 @@ model Company {
   deletedAt    DateTime?     @map("deleted_at")
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  owner    User?     @relation("CompanyOwner", fields: [ownerId], references: [id])
   contacts Contact[]
 
   @@index([tenantId])
   @@index([tenantId, status])
+  @@index([tenantId, ownerId])
   @@map("companies")
 }
 

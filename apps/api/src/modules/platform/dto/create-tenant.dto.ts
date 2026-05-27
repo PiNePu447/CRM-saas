@@ -21,7 +21,7 @@ export class CreateTenantDto {
   @IsObject()
   settings?: Record<string, unknown>;
 
-  @ApiProperty({ example: 'admin@acmecorp.com', description: 'Email for the initial SUPER_ADMIN user' })
+  @ApiProperty({ example: 'admin@acmecorp.com', description: 'Email for the initial ADMIN user' })
   @IsEmail()
   adminEmail: string;
 
@@ -30,7 +30,7 @@ export class CreateTenantDto {
   @Matches(STRONG_PASSWORD_REGEX, { message: STRONG_PASSWORD_MESSAGE })
   adminPassword: string;
 
-  @ApiProperty({ example: 'João Silva', description: 'Name of the initial SUPER_ADMIN user' })
+  @ApiProperty({ example: 'João Silva', description: 'Name of the initial ADMIN user' })
   @IsString()
   @MinLength(2)
   @MaxLength(100)

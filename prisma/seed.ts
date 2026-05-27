@@ -16,10 +16,10 @@ async function main() {
     },
   });
 
-  const passwordHash = await bcrypt.hash('senha123', 12);
+  const passwordHash = await bcrypt.hash('Admin@123456', 12);
 
   const admin = await prisma.user.upsert({
-    where: { tenantId_email: { tenantId: tenant.id, email: 'admin@demo.com' } },
+    where: { email: 'admin@demo.com' },
     update: {},
     create: {
       tenantId: tenant.id,
@@ -30,16 +30,35 @@ async function main() {
     },
   });
 
+  const manager = await prisma.user.upsert({
+    where: { email: 'gerente@demo.com' },
+    update: {},
+    create: {
+      tenantId: tenant.id,
+      email: 'gerente@demo.com',
+      passwordHash: await bcrypt.hash('Manager@123456', 12),
+      name: 'Carlos Gerente',
+      role: 'MANAGER',
+    },
+  });
+
   const seller = await prisma.user.upsert({
-    where: { tenantId_email: { tenantId: tenant.id, email: 'vendedor@demo.com' } },
+    where: { email: 'vendedor@demo.com' },
     update: {},
     create: {
       tenantId: tenant.id,
       email: 'vendedor@demo.com',
-      passwordHash: await bcrypt.hash('senha123', 12),
+      passwordHash: await bcrypt.hash('Seller@123456', 12),
       name: 'João Vendedor',
       role: 'SELLER',
+      managerId: manager.id,
     },
+  });
+
+  // Assign seller to manager if not already done
+  await prisma.user.update({
+    where: { id: seller.id },
+    data: { managerId: manager.id },
   });
 
   const pipeline = await prisma.pipeline.upsert({
@@ -64,9 +83,15 @@ async function main() {
     include: { stages: true },
   });
 
-  const company = await prisma.company.create({
+  // Create company assigned to the seller
+  const existingCompany = await prisma.company.findFirst({
+    where: { tenantId: tenant.id, name: 'Acme Corporation' },
+  });
+
+  const company = existingCompany ?? await prisma.company.create({
     data: {
       tenantId: tenant.id,
+      ownerId: seller.id,
       name: 'Acme Corporation',
       domain: 'acmecorp.com',
       industry: 'Tecnologia',
@@ -74,7 +99,16 @@ async function main() {
     },
   });
 
-  const contact = await prisma.contact.create({
+  // Ensure company owner is set
+  if (company.ownerId !== seller.id) {
+    await prisma.company.update({ where: { id: company.id }, data: { ownerId: seller.id } });
+  }
+
+  const existingContact = await prisma.contact.findFirst({
+    where: { tenantId: tenant.id, email: 'maria@acmecorp.com' },
+  });
+
+  const contact = existingContact ?? await prisma.contact.create({
     data: {
       tenantId: tenant.id,
       ownerId: seller.id,
@@ -88,44 +122,65 @@ async function main() {
 
   const prospecStage = pipeline.stages.find((s) => s.name === 'Qualificação')!;
 
-  await prisma.deal.create({
-    data: {
-      tenantId: tenant.id,
-      contactId: contact.id,
-      ownerId: seller.id,
-      pipelineId: pipeline.id,
-      stageId: prospecStage.id,
-      title: 'Implementação ERP - Acme Corp',
-      value: 45000,
-      probability: 60,
-      expectedCloseDate: new Date('2026-08-31'),
-      position: 1,
-    },
+  const existingDeal = await prisma.deal.findFirst({
+    where: { tenantId: tenant.id, title: 'Implementação ERP - Acme Corp' },
   });
 
-  await prisma.task.create({
-    data: {
-      tenantId: tenant.id,
-      assignedTo: seller.id,
-      contactId: contact.id,
-      title: 'Ligar para Maria amanhã às 14h',
-      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    },
+  if (!existingDeal) {
+    await prisma.deal.create({
+      data: {
+        tenantId: tenant.id,
+        contactId: contact.id,
+        ownerId: seller.id,
+        pipelineId: pipeline.id,
+        stageId: prospecStage.id,
+        title: 'Implementação ERP - Acme Corp',
+        value: 45000,
+        probability: 60,
+        expectedCloseDate: new Date('2026-08-31'),
+        position: 1,
+      },
+    });
+  }
+
+  const existingTask = await prisma.task.findFirst({
+    where: { tenantId: tenant.id, title: 'Ligar para Maria amanhã às 14h' },
   });
 
-  await prisma.activity.create({
-    data: {
-      tenantId: tenant.id,
-      contactId: contact.id,
-      userId: seller.id,
-      type: 'CALL',
-      content: { body: 'Ligação inicial realizada. Cliente interessado em proposta.' },
-    },
+  if (!existingTask) {
+    await prisma.task.create({
+      data: {
+        tenantId: tenant.id,
+        assignedTo: seller.id,
+        contactId: contact.id,
+        title: 'Ligar para Maria amanhã às 14h',
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  const existingActivity = await prisma.activity.findFirst({
+    where: { tenantId: tenant.id, contactId: contact.id, type: 'CALL' },
   });
+
+  if (!existingActivity) {
+    await prisma.activity.create({
+      data: {
+        tenantId: tenant.id,
+        contactId: contact.id,
+        userId: seller.id,
+        type: 'CALL',
+        content: { body: 'Ligação inicial realizada. Cliente interessado em proposta.' },
+      },
+    });
+  }
 
   console.log('Seed completed!');
-  console.log('Admin: admin@demo.com / Admin@123456');
-  console.log('Seller: vendedor@demo.com / Seller@123456');
+  console.log('Admin:   admin@demo.com    / Admin@123456');
+  console.log('Manager: gerente@demo.com  / Manager@123456');
+  console.log('Seller:  vendedor@demo.com / Seller@123456');
+  console.log(`Seller "${seller.name}" is assigned to manager "${manager.name}"`);
+  console.log(`Company "${company.name}" is owned by seller "${seller.name}"`);
 }
 
 main()

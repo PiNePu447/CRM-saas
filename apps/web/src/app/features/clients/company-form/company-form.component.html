@@ -75,6 +75,15 @@
           </select>
         </div>
       </div>
+
+      <!-- Owner (seller) assignment — only for ADMIN/MANAGER -->
+      <div *ngIf="isAdminOrManager" class="form-group">
+        <label class="form-label" for="company-owner">Vendedor Responsável</label>
+        <select id="company-owner" class="form-input" [(ngModel)]="form.ownerId" name="ownerId" [disabled]="saving">
+          <option [ngValue]="null">Sem responsável</option>
+          <option *ngFor="let s of sellers" [value]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
     </form>
   </div>
 

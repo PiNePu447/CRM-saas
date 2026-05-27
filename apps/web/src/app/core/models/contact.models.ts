@@ -13,7 +13,7 @@ export interface Contact {
   customFields: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
-  company?: { id: string; name: string };
+  company?: { id: string; name: string; owner?: { id: string; name: string; email: string } | null };
   owner?: { id: string; name: string };
   tags?: { tag: Tag }[];
 }

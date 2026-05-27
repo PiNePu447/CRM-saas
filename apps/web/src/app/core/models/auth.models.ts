@@ -33,4 +33,4 @@ export interface TenantInfo {
   settings?: Record<string, unknown>;
 }
 
-export type UserRole = 'PLATFORM_ADMIN' | 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'SELLER';
+export type UserRole = 'PLATFORM_ADMIN' | 'ADMIN' | 'MANAGER' | 'SELLER';

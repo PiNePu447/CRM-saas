@@ -19,11 +19,6 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user as CurrentUserData;
 
-    // SUPER_ADMIN has all tenant-level permissions
-    if (user?.role === UserRole.SUPER_ADMIN && requiredRoles.some((r) => r !== UserRole.PLATFORM_ADMIN)) {
-      return true;
-    }
-
     return requiredRoles.some((role) => user?.role === role);
   }
 }

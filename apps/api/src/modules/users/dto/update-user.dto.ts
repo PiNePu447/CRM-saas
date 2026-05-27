@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
 import { TenantUserRole } from './invite-user.dto';
 
 export class UpdateUserDto {
@@ -9,7 +9,7 @@ export class UpdateUserDto {
   @MinLength(2)
   name?: string;
 
-  // Restricted to tenant-level roles only — PLATFORM_ADMIN and SUPER_ADMIN cannot be
+  // Restricted to tenant-level roles only — PLATFORM_ADMIN cannot be
   // assigned via this endpoint to prevent privilege escalation
   @ApiPropertyOptional({ enum: TenantUserRole })
   @IsOptional()
@@ -20,4 +20,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ description: 'Assign seller to a manager (null to unassign)' })
+  @IsOptional()
+  @IsUUID()
+  managerId?: string;
 }

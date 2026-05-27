@@ -46,6 +46,11 @@ import { AuthGuard } from '../../core/guards/auth.guard';
             redirectTo: 'companies',
             pathMatch: 'full',
           },
+          {
+            path: 'team',
+            loadChildren: () =>
+              import('../team/team.module').then((m) => m.TeamModule),
+          },
         ],
       },
     ]),
