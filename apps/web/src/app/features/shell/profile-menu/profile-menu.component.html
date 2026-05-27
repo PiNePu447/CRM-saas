@@ -1,0 +1,123 @@
+<div class="relative">
+  <!-- Profile Avatar Button -->
+  <div 
+    *ngIf="authService.currentUser$ | async as user"
+    class="w-8 h-8 rounded-full bg-primary-container border border-outline-variant cursor-pointer flex items-center justify-center hover:ring-2 hover:ring-primary/30 transition-all overflow-hidden"
+    (click)="toggleDropdown()"
+    [title]="user.name">
+    <img 
+      *ngIf="user.avatarUrl"
+      [src]="user.avatarUrl"
+      [alt]="user.name"
+      class="w-full h-full object-cover" />
+    <span 
+      *ngIf="!user.avatarUrl"
+      class="text-on-primary-container font-medium text-sm">
+      {{ getUserInitial(user.name) }}
+    </span>
+  </div>
+
+  <!-- Dropdown Overlay -->
+  <div 
+    *ngIf="isOpen"
+    class="fixed inset-0 z-40"
+    (click)="closeDropdown()">
+  </div>
+
+  <!-- Dropdown Menu -->
+  <div 
+    *ngIf="isOpen && (authService.currentUser$ | async as user)"
+    class="absolute right-0 mt-2 w-64 bg-surface border border-outline-variant rounded-xl shadow-lg z-50 overflow-hidden">
+    <!-- User Info -->
+    <div class="px-4 py-3 border-b border-outline-variant">
+      <div class="font-label-md text-label-md text-on-background">{{ user.name }}</div>
+      <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">{{ user.email }}</div>
+    </div>
+
+    <!-- Menu Items -->
+    <div class="py-2">
+      <button 
+        class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors"
+        (click)="openEditModal()">
+        <span class="material-symbols-outlined text-lg">edit</span>
+        <span class="font-label-md text-label-md">Editar Perfil</span>
+      </button>
+      <button 
+        class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors"
+        (click)="logout()">
+        <span class="material-symbols-outlined text-lg">logout</span>
+        <span class="font-label-md text-label-md">Sair</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div *ngIf="showEditModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="closeEditModal()">
+  <div class="bg-surface rounded-xl shadow-xl w-full max-w-md mx-4" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+      <h2 class="font-headline-sm text-headline-sm text-on-background">Editar Perfil</h2>
+      <button 
+        class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors"
+        (click)="closeEditModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div class="px-6 py-4 space-y-4">
+      <!-- Name -->
+      <div>
+        <label class="block font-label-md text-label-md text-on-background mb-2">Nome</label>
+        <input 
+          type="text"
+          [(ngModel)]="editForm.name"
+          class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+          placeholder="Seu nome" />
+      </div>
+
+      <!-- Avatar URL -->
+      <div>
+        <label class="block font-label-md text-label-md text-on-background mb-2">URL da Foto</label>
+        <input 
+          type="url"
+          [(ngModel)]="editForm.avatarUrl"
+          class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+          placeholder="https://..." />
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Cole o URL de uma imagem para usar como foto de perfil
+        </p>
+      </div>
+
+      <!-- Preview -->
+      <div *ngIf="editForm.avatarUrl" class="flex items-center gap-3">
+        <div class="w-16 h-16 rounded-full overflow-hidden bg-surface-container">
+          <img 
+            [src]="editForm.avatarUrl" 
+            alt="Preview"
+            class="w-full h-full object-cover"
+            (error)="editForm.avatarUrl = ''" />
+        </div>
+        <span class="font-body-sm text-body-sm text-on-surface-variant">Preview da foto</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant">
+      <button 
+        class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-md text-label-md"
+        (click)="closeEditModal()"
+        [disabled]="saving">
+        Cancelar
+      </button>
+      <button 
+        class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+        (click)="saveProfile()"
+        [disabled]="saving">
+        <span *ngIf="saving" class="inline-block w-4 h-4 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin"></span>
+        {{ saving ? 'Salvando...' : 'Salvar' }}
+      </button>
+    </div>
+  </div>
+</div>

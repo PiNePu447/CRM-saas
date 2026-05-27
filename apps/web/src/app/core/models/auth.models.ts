@@ -23,6 +23,7 @@ export interface UserProfile {
   name: string;
   email: string;
   role: UserRole;
+  avatarUrl?: string | null;
   tenant?: TenantInfo | null;
 }
 

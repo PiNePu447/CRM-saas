@@ -7,6 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class ShellComponent {
   sidebarOpen = false;
+  sidebarCollapsed = false;
 
   constructor(readonly authService: AuthService) {}
 
@@ -16,6 +17,10 @@ export class ShellComponent {
 
   closeSidebar(): void {
     this.sidebarOpen = false;
+  }
+
+  onSidebarToggle(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 }
 

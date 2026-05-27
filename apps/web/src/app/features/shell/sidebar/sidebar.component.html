@@ -1,23 +1,43 @@
 <aside 
-  class="fixed top-0 left-0 h-screen w-[280px] bg-surface border-r border-outline-variant flex flex-col z-50 transition-transform duration-300 lg:translate-x-0"
+  class="fixed top-0 left-0 h-screen bg-surface border-r border-outline-variant flex flex-col z-50 transition-all duration-300 lg:translate-x-0"
+  [class.w-[280px]]="!collapsed"
+  [class.w-[64px]]="collapsed"
   [class.-translate-x-full]="!isOpen"
   [class.translate-x-0]="isOpen"
 >
   <!-- Logo Area -->
   <div class="flex items-center gap-3 px-stack-sm py-stack-md border-b border-outline-variant">
-    <div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center shadow-primary-glow">
-      <span class="material-symbols-outlined text-on-primary-container text-xl">domain</span>
+    <div *ngIf="authService.currentUser$ | async as user" class="w-8 h-8 rounded bg-primary-container flex items-center justify-center shadow-primary-glow flex-shrink-0 overflow-hidden">
+      <img 
+        *ngIf="getTenantLogo(user)"
+        [src]="getTenantLogo(user)" 
+        [alt]="getTenantName(user)"
+        class="w-full h-full object-cover" />
+      <span 
+        *ngIf="!getTenantLogo(user)"
+        class="material-symbols-outlined text-on-primary-container text-xl">domain</span>
     </div>
-    <div>
-      <h1 class="font-headline-sm text-headline-sm font-bold text-primary">SalesForceX</h1>
-      <p class="font-label-sm text-label-sm text-outline">Enterprise Tier</p>
+    <div *ngIf="!collapsed && (authService.currentUser$ | async as user)" class="flex-1 min-w-0">
+      <h1 class="font-headline-sm text-headline-sm font-bold text-primary truncate">{{ getTenantName(user) }}</h1>
+      <p class="font-label-sm text-label-sm text-outline">CRM</p>
     </div>
     <button 
+      *ngIf="!collapsed"
       class="ml-auto p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors lg:hidden" 
       (click)="onNavClick()" 
       aria-label="Fechar menu"
     >
       <span class="material-symbols-outlined">close</span>
+    </button>
+    <button 
+      class="p-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors hidden lg:flex"
+      [class.ml-auto]="collapsed"
+      (click)="onToggleCollapse()"
+      [title]="collapsed ? 'Expandir menu' : 'Recolher menu'"
+    >
+      <span class="material-symbols-outlined text-lg">
+        {{ collapsed ? 'chevron_right' : 'chevron_left' }}
+      </span>
     </button>
   </div>
 
@@ -29,12 +49,14 @@
       routerLinkActive="bg-surface-container-high text-primary border-l-2 border-primary"
       [routerLinkActiveOptions]="{exact: false}"
       class="flex items-center gap-stack-md px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200"
+      [class.justify-center]="collapsed"
+      [title]="collapsed ? item.label : ''"
       (click)="onNavClick()"
     >
       <span class="material-symbols-outlined" [class.font-variation-settings-fill]="isActive(item.route)">
         {{ item.icon }}
       </span>
-      <span class="font-label-md text-label-md">{{ item.label }}</span>
+      <span *ngIf="!collapsed" class="font-label-md text-label-md">{{ item.label }}</span>
     </a>
   </nav>
 
@@ -43,17 +65,21 @@
     <a 
       href="#" 
       class="flex items-center gap-stack-md px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200"
+      [class.justify-center]="collapsed"
+      [title]="collapsed ? 'Ajuda' : ''"
       (click)="$event.preventDefault()"
     >
       <span class="material-symbols-outlined">help</span>
-      <span class="font-label-md text-label-md">Ajuda</span>
+      <span *ngIf="!collapsed" class="font-label-md text-label-md">Ajuda</span>
     </a>
     <button 
       (click)="logout()" 
       class="flex items-center gap-stack-md px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 w-full text-left"
+      [class.justify-center]="collapsed"
+      [title]="collapsed ? 'Sair' : ''"
     >
       <span class="material-symbols-outlined">logout</span>
-      <span class="font-label-md text-label-md">Sair</span>
+      <span *ngIf="!collapsed" class="font-label-md text-label-md">Sair</span>
     </button>
   </div>
 </aside>

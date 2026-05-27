@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({ standalone: false,
@@ -6,5 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './topbar.component.html',
 })
 export class TopbarComponent {
+  @Input() collapsed = false;
+  
   constructor(readonly authService: AuthService) {}
 }

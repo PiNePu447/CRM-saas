@@ -1,0 +1,76 @@
+<div class="relative">
+  <!-- Notification Bell Button -->
+  <button 
+    class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 relative"
+    (click)="toggleDropdown()"
+    title="Notificações">
+    <span class="material-symbols-outlined">notifications</span>
+    <span 
+      *ngIf="(notificationsService.unreadCount$ | async) as unreadCount"
+      class="absolute top-1 right-1 w-4 h-4 bg-error text-on-error rounded-full flex items-center justify-center text-xs font-medium"
+      [class.hidden]="unreadCount === 0">
+      {{ unreadCount > 9 ? '9+' : unreadCount }}
+    </span>
+  </button>
+
+  <!-- Dropdown Menu -->
+  <div 
+    *ngIf="isOpen"
+    class="fixed inset-0 z-40"
+    (click)="closeDropdown()">
+  </div>
+
+  <div 
+    *ngIf="isOpen"
+    class="absolute right-0 mt-2 w-96 bg-surface border border-outline-variant rounded-xl shadow-lg z-50 overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
+      <h3 class="font-headline-sm text-headline-sm text-on-background">Notificações</h3>
+      <button 
+        *ngIf="notifications.some(n => !n.read)"
+        class="text-primary font-label-sm text-label-sm hover:underline"
+        (click)="markAllAsRead()">
+        Marcar todas como lidas
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex items-center justify-center py-12">
+      <div class="inline-block w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && notifications.length === 0" class="flex flex-col items-center justify-center py-12 px-4">
+      <span class="material-symbols-outlined text-6xl text-outline mb-2">notifications_off</span>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Nenhuma notificação</p>
+    </div>
+
+    <!-- Notifications List -->
+    <div *ngIf="!loading && notifications.length > 0" class="max-h-96 overflow-y-auto">
+      <div 
+        *ngFor="let notification of notifications"
+        class="px-4 py-3 border-b border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer"
+        [class.bg-primary-container/10]="!notification.read"
+        (click)="markAsRead(notification, $event)">
+        <div class="flex items-start gap-3">
+          <div 
+            class="flex-shrink-0 w-2 h-2 rounded-full mt-1.5"
+            [class.bg-primary]="!notification.read"
+            [class.bg-transparent]="notification.read">
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-label-md text-label-md text-on-background">
+              {{ notification.title }}
+            </div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              {{ notification.message }}
+            </div>
+            <div class="font-label-sm text-label-sm text-outline mt-1">
+              {{ getTimeAgo(notification.createdAt) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

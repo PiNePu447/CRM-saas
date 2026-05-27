@@ -215,4 +215,25 @@ export class UsersService {
     });
     if (!manager) throw new NotFoundException(`Manager ${managerId} not found`);
   }
+
+  async updateProfile(userId: string, dto: { name?: string; avatarUrl?: string }) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException(`User ${userId} not found`);
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(dto.name && { name: dto.name }),
+        ...(dto.avatarUrl !== undefined && { avatarUrl: dto.avatarUrl }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatarUrl: true,
+        tenant: { select: { id: true, name: true, slug: true, settings: true } },
+      },
+    });
+  }
 }

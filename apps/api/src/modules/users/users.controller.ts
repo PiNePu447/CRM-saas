@@ -15,6 +15,7 @@ import { UserRole } from '@prisma/client';
 import { UsersService } from './users.service';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -81,5 +82,11 @@ export class UsersController {
         : body.managerId;
 
     return this.usersService.assignSellerToManager(sellerId, managerId, user.tenantId);
+  }
+
+  @Patch('profile/me')
+  @ApiOperation({ summary: 'Update own profile (name and avatar)' })
+  updateProfile(@CurrentUser() user: CurrentUserData, @Body() dto: UpdateProfileDto) {
+    return this.usersService.updateProfile(user.sub, dto);
   }
 }

@@ -1,6 +1,11 @@
 <div class="min-h-screen bg-surface-bright">
-  <app-sidebar [isOpen]="sidebarOpen" (closed)="closeSidebar()"></app-sidebar>
-  <app-topbar></app-topbar>
+  <app-sidebar 
+    [isOpen]="sidebarOpen" 
+    [collapsed]="sidebarCollapsed"
+    (closed)="closeSidebar()"
+    (toggleCollapse)="onSidebarToggle()">
+  </app-sidebar>
+  <app-topbar [collapsed]="sidebarCollapsed"></app-topbar>
   
   <!-- Mobile Header -->
   <div class="fixed top-0 left-0 right-0 h-16 bg-surface border-b border-outline-variant flex items-center px-4 z-30 lg:hidden">
@@ -11,11 +16,16 @@
     >
       <span class="material-symbols-outlined">menu</span>
     </button>
-    <h1 class="ml-3 font-headline-sm text-headline-sm font-bold text-primary">SalesForceX</h1>
+    <h1 *ngIf="authService.currentUser$ | async as user" class="ml-3 font-headline-sm text-headline-sm font-bold text-primary">
+      {{ user.tenant?.name || 'SalesForceX' }}
+    </h1>
   </div>
   
   <!-- Main Content Area -->
-  <div class="lg:ml-[280px] min-h-screen pt-16 lg:pt-16">
+  <div 
+    class="min-h-screen pt-16 lg:pt-16 transition-all duration-300"
+    [class.lg:ml-[280px]]="!sidebarCollapsed"
+    [class.lg:ml-[64px]]="sidebarCollapsed">
     <router-outlet></router-outlet>
   </div>
 </div>

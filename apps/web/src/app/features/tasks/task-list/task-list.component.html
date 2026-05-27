@@ -1,85 +1,224 @@
-<div class="page">
-  <div class="page-header">
-    <h1 class="page-title">Tarefas</h1>
-    <div class="page-header-actions">
-      <div class="view-toggle">
-        <button [class.active]="view === 'list'" (click)="switchView('list')" class="view-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Lista
-        </button>
-        <button [class.active]="view === 'calendar'" (click)="switchView('calendar')" class="view-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Calendário
-        </button>
+<main class="p-margin-page">
+  <div class="max-w-container-max mx-auto flex flex-col gap-stack-lg">
+    <!-- Page Header -->
+    <div class="flex justify-between items-start gap-4 flex-wrap">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-background">Tarefas</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Gerencie suas tarefas e acompanhe o progresso.
+        </p>
       </div>
-      <button class="btn-primary" (click)="openNewTask()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nova Tarefa
-      </button>
-    </div>
-  </div>
-
-  <!-- LIST VIEW -->
-  <ng-container *ngIf="view === 'list'">
-    <div class="filters-bar">
-      <div class="filter-tabs">
-        <button
-          class="filter-tab"
-          [class.active]="filterCompleted === false"
-          (click)="filterCompleted = false; loadTasks()"
-        >Pendentes</button>
-        <button
-          class="filter-tab"
-          [class.active]="filterCompleted === true"
-          (click)="filterCompleted = true; loadTasks()"
-        >Concluídas</button>
-        <button
-          class="filter-tab"
-          [class.active]="filterCompleted === undefined"
-          (click)="filterCompleted = undefined; loadTasks()"
-        >Todas</button>
+      <div class="flex items-center gap-3">
+        <!-- View Toggle -->
+        <div class="flex items-center bg-surface-container-lowest border border-outline-variant rounded-lg p-1">
+          <button 
+            (click)="switchView('list')" 
+            [class.bg-primary-container]="view === 'list'"
+            [class.text-on-primary-container]="view === 'list'"
+            [class.text-on-surface-variant]="view !== 'list'"
+            class="px-3 py-1.5 rounded font-label-sm text-label-sm transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">list</span>
+            Lista
+          </button>
+          <button 
+            (click)="switchView('calendar')" 
+            [class.bg-primary-container]="view === 'calendar'"
+            [class.text-on-primary-container]="view === 'calendar'"
+            [class.text-on-surface-variant]="view !== 'calendar'"
+            class="px-3 py-1.5 rounded font-label-sm text-label-sm transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">calendar_month</span>
+            Calendário
+          </button>
+        </div>
+        <button 
+          class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+          (click)="openNewTask()">
+          <span class="material-symbols-outlined text-lg">add</span>
+          Nova Tarefa
+        </button>
       </div>
     </div>
 
-    <div *ngIf="loading" class="loading-state"><div class="spinner-lg"></div></div>
-
-    <div *ngIf="!loading" class="task-board">
-      <div *ngIf="tasks.length === 0" class="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        <p>Nenhuma tarefa encontrada.</p>
+    <!-- LIST VIEW -->
+    <ng-container *ngIf="view === 'list'">
+      <!-- Filter Tabs -->
+      <div class="flex items-center gap-2 border-b border-outline-variant">
+        <button
+          class="px-4 py-2 font-label-md text-label-md transition-colors border-b-2"
+          [class.border-primary]="filterCompleted === false"
+          [class.text-primary]="filterCompleted === false"
+          [class.border-transparent]="filterCompleted !== false"
+          [class.text-on-surface-variant]="filterCompleted !== false"
+          (click)="filterCompleted = false; loadTasks()">
+          Pendentes
+        </button>
+        <button
+          class="px-4 py-2 font-label-md text-label-md transition-colors border-b-2"
+          [class.border-primary]="filterCompleted === true"
+          [class.text-primary]="filterCompleted === true"
+          [class.border-transparent]="filterCompleted !== true"
+          [class.text-on-surface-variant]="filterCompleted !== true"
+          (click)="filterCompleted = true; loadTasks()">
+          Concluídas
+        </button>
+        <button
+          class="px-4 py-2 font-label-md text-label-md transition-colors border-b-2"
+          [class.border-primary]="filterCompleted === undefined"
+          [class.text-primary]="filterCompleted === undefined"
+          [class.border-transparent]="filterCompleted !== undefined"
+          [class.text-on-surface-variant]="filterCompleted !== undefined"
+          (click)="filterCompleted = undefined; loadTasks()">
+          Todas
+        </button>
       </div>
 
-      <div *ngFor="let task of tasks" class="task-row" [class.task-completed]="task.completedAt" [class.task-overdue]="isOverdue(task)">
-        <button class="task-check" (click)="completeTask(task)" [disabled]="!!task.completedAt">
-          <svg *ngIf="task.completedAt" width="16" height="16" viewBox="0 0 24 24" fill="#10B981" stroke="none"><path d="M20 6L9 17l-5-5"/></svg>
-          <span *ngIf="!task.completedAt" class="task-check-empty"></span>
-        </button>
-        <div class="task-content">
-          <span class="task-title-row">{{ task.title }}</span>
-          <div class="task-meta-row">
-            <span *ngIf="task.contact">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              {{ task.contact.name }}
-            </span>
-            <span *ngIf="task.deal">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-              {{ task.deal.title }}
-            </span>
-            <span class="task-assignee">{{ task.assignee.name }}</span>
+      <!-- Loading -->
+      <div *ngIf="loading" class="flex items-center justify-center py-20">
+        <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && tasks.length === 0" class="flex flex-col items-center justify-center py-16 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl">
+        <span class="material-symbols-outlined text-6xl text-outline mb-4">task_alt</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">Nenhuma tarefa encontrada.</p>
+      </div>
+
+      <!-- Tasks List -->
+      <div *ngIf="!loading && tasks.length > 0" class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+        <div *ngFor="let task of tasks" 
+             class="flex items-center gap-4 px-4 py-3 border-b border-outline-variant last:border-b-0 hover:bg-surface-container-low transition-colors"
+             [class.opacity-60]="task.completedAt">
+          <!-- Checkbox -->
+          <button 
+            class="flex-shrink-0 w-5 h-5 rounded border-2 transition-all flex items-center justify-center"
+            [class.border-primary]="!task.completedAt"
+            [class.bg-primary]="task.completedAt"
+            [class.border-primary]="task.completedAt"
+            (click)="completeTask(task)" 
+            [disabled]="!!task.completedAt">
+            <span *ngIf="task.completedAt" class="material-symbols-outlined text-sm text-on-primary">check</span>
+          </button>
+
+          <!-- Task Content -->
+          <div class="flex-1 min-w-0">
+            <div class="font-body-md text-body-md text-on-background"
+                 [class.line-through]="task.completedAt">
+              {{ task.title }}
+            </div>
+            <div class="flex items-center gap-3 mt-1 text-on-surface-variant font-body-sm text-body-sm">
+              <span *ngIf="task.contact" class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">person</span>
+                {{ task.contact.name }}
+              </span>
+              <span *ngIf="task.deal" class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">trending_up</span>
+                {{ task.deal.title }}
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">account_circle</span>
+                {{ task.assignee.name }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Due Date -->
+          <div *ngIf="task.dueDate" 
+               class="flex-shrink-0 font-body-sm text-body-sm"
+               [class.text-error]="isOverdue(task)"
+               [class.text-on-surface-variant]="!isOverdue(task)">
+            {{ task.dueDate | date:'dd/MM HH:mm' }}
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button 
+              class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all"
+              (click)="openEditTask(task)" 
+              title="Editar tarefa">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button 
+              class="p-2 rounded-full text-error hover:bg-error/10 transition-all"
+              (click)="deleteTask(task)" 
+              title="Excluir tarefa">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
           </div>
         </div>
-        <div class="task-due" *ngIf="task.dueDate" [class.overdue-text]="isOverdue(task)">
-          {{ task.dueDate | date:'dd/MM HH:mm' }}
-        </div>
-        <button class="btn-ghost-sm" (click)="openEditTask(task)" title="Editar tarefa">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+    </ng-container>
+
+    <!-- CALENDAR VIEW -->
+    <ng-container *ngIf="view === 'calendar'">
+      <!-- Calendar Navigation -->
+      <div class="flex justify-between items-center bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-3">
+        <button 
+          class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-md text-label-md flex items-center gap-2"
+          (click)="prevMonth()">
+          <span class="material-symbols-outlined">chevron_left</span>
+          Anterior
         </button>
-        <button class="btn-ghost-sm btn-danger-sm" (click)="deleteTask(task)" title="Excluir tarefa">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        <h3 class="font-headline-sm text-headline-sm text-on-background capitalize">
+          {{ calendarMonth | date:'MMMM yyyy' : '' : 'pt-BR' }}
+        </h3>
+        <button 
+          class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-md text-label-md flex items-center gap-2"
+          (click)="nextMonth()">
+          Próximo
+          <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
-    </div>
-  </ng-container>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="flex items-center justify-center py-20">
+        <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div *ngIf="!loading" class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+        <!-- Weekday Headers -->
+        <div class="grid grid-cols-7 border-b border-outline-variant bg-surface-container-low">
+          <div *ngFor="let day of ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']" 
+               class="px-2 py-3 text-center font-label-sm text-label-sm text-on-surface-variant font-medium">
+            {{ day }}
+          </div>
+        </div>
+        
+        <!-- Calendar Days -->
+        <div class="grid grid-cols-7">
+          <div
+            *ngFor="let day of calendarDays"
+            class="min-h-[120px] border-b border-r border-outline-variant last:border-r-0 p-2"
+            [class.bg-surface-container-low]="day.isPadding"
+            [class.bg-primary-container]="!day.isPadding && day.date && day.date.toDateString() === today.toDateString()">
+            <ng-container *ngIf="!day.isPadding && day.date">
+              <div class="font-label-sm text-label-sm font-medium mb-1"
+                   [class.text-primary]="day.date.toDateString() === today.toDateString()"
+                   [class.text-on-surface]="day.date.toDateString() !== today.toDateString()">
+                {{ day.date.getDate() }}
+              </div>
+              <div class="space-y-1">
+                <div *ngFor="let task of day.tasks.slice(0, 3)" 
+                     class="text-xs px-2 py-1 rounded truncate"
+                     [class.bg-error]="isOverdue(task)"
+                     [class.text-on-error]="isOverdue(task)"
+                     [class.bg-surface-container]="!isOverdue(task)"
+                     [class.text-on-surface]="!isOverdue(task)"
+                     [title]="task.title">
+                  {{ task.title }}
+                </div>
+                <div *ngIf="day.tasks.length > 3" 
+                     class="text-xs px-2 py-1 text-on-surface-variant">
+                  +{{ day.tasks.length - 3 }} mais
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</main>
 
 <!-- Task Form Modal -->
 <app-task-form
@@ -88,37 +227,3 @@
   (saved)="onTaskSaved($event)"
   (cancelled)="closeTaskForm()"
 ></app-task-form>
-
-  <!-- CALENDAR VIEW -->
-  <ng-container *ngIf="view === 'calendar'">
-    <div class="calendar-nav">
-      <button class="btn-ghost" (click)="prevMonth()">← Anterior</button>
-      <h2 class="calendar-month-title">{{ calendarMonth | date:'MMMM yyyy' : '' : 'pt-BR' }}</h2>
-      <button class="btn-ghost" (click)="nextMonth()">Próximo →</button>
-    </div>
-
-    <div *ngIf="loading" class="loading-state"><div class="spinner-lg"></div></div>
-
-    <div *ngIf="!loading" class="calendar-grid">
-      <div class="calendar-header-row">
-        <div *ngFor="let day of ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']" class="calendar-weekday">{{ day }}</div>
-      </div>
-      <div class="calendar-days">
-        <div
-          *ngFor="let day of calendarDays"
-          class="calendar-day"
-          [class.has-tasks]="day.tasks.length > 0"
-          [class.today]="day.date.toDateString() === today.toDateString()"
-        >
-          <span class="day-number">{{ day.date.getDate() }}</span>
-          <div class="day-tasks">
-            <div *ngFor="let task of day.tasks.slice(0, 3)" class="day-task-dot" [class.overdue-dot]="isOverdue(task)">
-              {{ task.title | slice:0:20 }}
-            </div>
-            <span *ngIf="day.tasks.length > 3" class="day-tasks-more">+{{ day.tasks.length - 3 }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </ng-container>
-</div>

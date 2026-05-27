@@ -68,14 +68,15 @@ model Tenant {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  users      User[]
-  contacts   Contact[]
-  companies  Company[]
-  deals      Deal[]
-  tasks      Task[]
-  activities Activity[]
-  pipelines  Pipeline[]
-  tags       Tag[]
+  users         User[]
+  contacts      Contact[]
+  companies     Company[]
+  deals         Deal[]
+  tasks         Task[]
+  activities    Activity[]
+  pipelines     Pipeline[]
+  tags          Tag[]
+  notifications Notification[]
 
   @@map("tenants")
 }
@@ -87,6 +88,7 @@ model User {
   passwordHash String    @map("password_hash")
   name         String
   role         UserRole  @default(SELLER)
+  avatarUrl    String?   @map("avatar_url")
   isActive     Boolean   @default(true) @map("is_active")
   refreshToken String?   @map("refresh_token")
   createdAt    DateTime  @default(now()) @map("created_at")
@@ -100,9 +102,10 @@ model User {
   sellers       User[]     @relation("ManagerSellers")
   ownedContacts Contact[]  @relation("ContactOwner")
   ownedDeals    Deal[]     @relation("DealOwner")
-  ownedCompanies Company[] @relation("CompanyOwner")
-  assignedTasks Task[]     @relation("TaskAssignee")
-  activities    Activity[]
+  ownedCompanies Company[]      @relation("CompanyOwner")
+  assignedTasks  Task[]         @relation("TaskAssignee")
+  activities     Activity[]
+  notifications  Notification[]
 
   @@index([tenantId])
   @@index([tenantId, managerId])
@@ -308,4 +311,27 @@ model Activity {
   @@index([tenantId, contactId, createdAt(sort: Desc)])
   @@index([tenantId, dealId])
   @@map("activities")
+}
+
+// =====================
+// NOTIFICATIONS
+// =====================
+
+model Notification {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  userId    String   @map("user_id")
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  data      Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, userId, read])
+  @@index([tenantId, userId, createdAt(sort: Desc)])
+  @@map("notifications")
 }

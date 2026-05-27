@@ -13,7 +13,7 @@ export class TaskListComponent implements OnInit {
   view: 'list' | 'calendar' = 'list';
   today = new Date();
 
-  calendarDays: { date: Date; tasks: Task[] }[] = [];
+  calendarDays: { date: Date | null; tasks: Task[]; isPadding: boolean }[] = [];
   calendarMonth: Date = new Date();
 
   showTaskForm = false;
@@ -53,8 +53,17 @@ export class TaskListComponent implements OnInit {
   }
 
   buildCalendar(year: number, month: number, tasks: Task[]): void {
+    const firstDay = new Date(year, month, 1);
+    const startPadding = firstDay.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    this.calendarDays = Array.from({ length: daysInMonth }, (_, i) => {
+
+    const paddingDays = Array.from({ length: startPadding }, () => ({
+      date: null,
+      tasks: [],
+      isPadding: true,
+    }));
+
+    const monthDays = Array.from({ length: daysInMonth }, (_, i) => {
       const date = new Date(year, month, i + 1);
       return {
         date,
@@ -63,8 +72,11 @@ export class TaskListComponent implements OnInit {
           const d = new Date(t.dueDate);
           return d.getFullYear() === year && d.getMonth() === month && d.getDate() === i + 1;
         }),
+        isPadding: false,
       };
     });
+
+    this.calendarDays = [...paddingDays, ...monthDays];
   }
 
   switchView(view: 'list' | 'calendar'): void {

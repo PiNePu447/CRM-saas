@@ -8,7 +8,7 @@ import {
 } from '../../../core/services/platform.service';
 import { AuthService } from '../../../core/services/auth.service';
 
-type ModalMode = 'create-tenant' | 'edit-tenant' | 'create-super-admin' | null;
+type ModalMode = 'create-tenant' | 'edit-tenant' | 'create-super-admin' | 'edit-branding' | null;
 
 @Component({
   standalone: false,
@@ -26,6 +26,11 @@ export class TenantListComponent implements OnInit {
 
   tenantForm: Partial<CreateTenantPayload> = {};
   superAdminForm: Partial<CreateSuperAdminPayload> = {};
+  brandingForm = {
+    logoUrl: '',
+    primaryColor: '#6366f1',
+    secondaryColor: '#8b5cf6',
+  };
   saving = false;
   formError = '';
 
@@ -83,12 +88,30 @@ export class TenantListComponent implements OnInit {
     this.modalMode = 'create-super-admin';
   }
 
+  openEditBranding(tenant: Tenant): void {
+    this.formError = '';
+    this.loadingTenant = true;
+    this.platformService.getTenant(tenant.id).subscribe({
+      next: (detail) => {
+        this.selectedTenant = detail;
+        const branding = (detail.settings as any)?.branding || {};
+        this.brandingForm.logoUrl = branding.logoUrl || '';
+        this.brandingForm.primaryColor = branding.primaryColor || '#6366f1';
+        this.brandingForm.secondaryColor = branding.secondaryColor || '#8b5cf6';
+        this.loadingTenant = false;
+      },
+      error: () => (this.loadingTenant = false),
+    });
+    this.modalMode = 'edit-branding';
+  }
+
   closeModal(): void {
     if (this.saving) return;
     this.modalMode = null;
     this.selectedTenant = null;
     this.tenantForm = {};
     this.superAdminForm = {};
+    this.brandingForm = { logoUrl: '', primaryColor: '#6366f1', secondaryColor: '#8b5cf6' };
     this.formError = '';
   }
 
@@ -139,6 +162,26 @@ export class TenantListComponent implements OnInit {
         this.saving = false;
         this.formError = err.error?.message?.error ?? err.error?.message ?? 'Erro ao criar super-admin.';
       },
+    });
+  }
+
+  submitEditBranding(): void {
+    if (!this.selectedTenant) return;
+    
+    const settings = {
+      ...(this.selectedTenant.settings as any || {}),
+      branding: {
+        logoUrl: this.brandingForm.logoUrl || null,
+        primaryColor: this.brandingForm.primaryColor,
+        secondaryColor: this.brandingForm.secondaryColor,
+      },
+    };
+
+    this.saving = true;
+    this.formError = '';
+    this.platformService.updateTenant(this.selectedTenant.id, { settings }).subscribe({
+      next: () => { this.saving = false; this.closeModal(); this.loadTenants(); },
+      error: () => { this.saving = false; this.formError = 'Erro ao atualizar branding.'; },
     });
   }
 

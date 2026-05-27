@@ -10,6 +10,7 @@ import { ContactsModule } from '../modules/contacts/contacts.module';
 import { DealsModule } from '../modules/deals/deals.module';
 import { TasksModule } from '../modules/tasks/tasks.module';
 import { PlatformModule } from '../modules/platform/platform.module';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { AllExceptionsFilter } from '../common/filters/http-exception.filter';
@@ -36,6 +37,7 @@ import { AppService } from './app.service';
     DealsModule,
     TasksModule,
     PlatformModule,
+    NotificationsModule,
   ],
   providers: [
     AppService,

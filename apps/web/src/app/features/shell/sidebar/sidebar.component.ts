@@ -15,7 +15,9 @@ interface NavItem {
 })
 export class SidebarComponent {
   @Input() isOpen = false;
+  @Input() collapsed = false;
   @Output() closed = new EventEmitter<void>();
+  @Output() toggleCollapse = new EventEmitter<void>();
 
   private readonly allNavItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
@@ -46,5 +48,18 @@ export class SidebarComponent {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  onToggleCollapse(): void {
+    this.toggleCollapse.emit();
+  }
+
+  getTenantName(user: any): string {
+    return user?.tenant?.name || 'SalesForceX';
+  }
+
+  getTenantLogo(user: any): string | null {
+    const branding = user?.tenant?.settings?.branding as { logoUrl?: string } | undefined;
+    return branding?.logoUrl || null;
   }
 }

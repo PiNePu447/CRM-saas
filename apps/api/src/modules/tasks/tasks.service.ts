@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ActivityType, UserRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -8,7 +9,10 @@ class UpdateTaskDto extends PartialType(CreateTaskDto) {}
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   private buildOwnerFilter(userId: string, userRole: string) {
     if (userRole === UserRole.SELLER) return { assignedTo: userId };
@@ -153,13 +157,24 @@ export class TasksService {
       });
     }
 
+    // Create notification if task is assigned to someone else
+    if (assignedTo !== userId) {
+      await this.notificationsService.create(tenantId, {
+        userId: assignedTo,
+        type: 'TASK_ASSIGNED',
+        title: 'Nova tarefa atribuída',
+        message: `Você recebeu uma nova tarefa: "${task.title}"`,
+        data: { taskId: task.id, taskTitle: task.title },
+      });
+    }
+
     return task;
   }
 
   async update(id: string, tenantId: string, userId: string, userRole: string, dto: UpdateTaskDto) {
-    await this.assertCanModify(id, tenantId, userId, userRole);
+    const existingTask = await this.assertCanModify(id, tenantId, userId, userRole);
 
-    return this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       where: { id },
       data: {
         ...dto,
@@ -170,6 +185,19 @@ export class TasksService {
         contact: { select: { id: true, name: true } },
       },
     });
+
+    // Create notification if assignee changed and it's not the current user
+    if (dto.assignedTo && dto.assignedTo !== existingTask.assignedTo && dto.assignedTo !== userId) {
+      await this.notificationsService.create(tenantId, {
+        userId: dto.assignedTo,
+        type: 'TASK_ASSIGNED',
+        title: 'Tarefa atribuída a você',
+        message: `Uma tarefa foi atribuída a você: "${updatedTask.title}"`,
+        data: { taskId: updatedTask.id, taskTitle: updatedTask.title },
+      });
+    }
+
+    return updatedTask;
   }
 
   async complete(id: string, tenantId: string, userId: string, userRole: string) {

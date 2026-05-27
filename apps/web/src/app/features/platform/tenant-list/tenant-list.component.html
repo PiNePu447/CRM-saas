@@ -107,6 +107,12 @@
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
               </button>
+              <button class="btn-ghost-sm" title="Branding" (click)="openEditBranding(tenant)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.4 4.4l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.4-4.4l4.2-4.2"/>
+                </svg>
+              </button>
               <button class="btn-ghost-sm" title="Editar tenant" (click)="openEditTenant(tenant)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -258,6 +264,61 @@
       <button class="btn-ghost" (click)="closeModal()" [disabled]="saving">Cancelar</button>
       <button class="btn-primary" (click)="submitCreateSuperAdmin()" [disabled]="saving || loadingTenant">
         {{ saving ? 'Criando...' : 'Criar Super Admin' }}
+      </button>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Edit Branding Modal -->
+<ng-container *ngIf="modalMode === 'edit-branding'">
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal" role="dialog">
+    <div class="modal-header">
+      <h2 class="modal-title">Editar Branding do Tenant</h2>
+      <button class="modal-close" (click)="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="loadingTenant" class="loading-state-sm"><div class="spinner"></div></div>
+      <div *ngIf="!loadingTenant && selectedTenant">
+        <p style="color:var(--gray-600);font-size:14px;margin-bottom:24px">
+          <strong>{{ selectedTenant.name }}</strong> ({{ selectedTenant.slug }})
+        </p>
+        <div *ngIf="formError" class="alert alert-error" style="margin-bottom:16px">{{ formError }}</div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="form-group">
+            <label class="form-label">URL do Logo</label>
+            <input type="url" class="form-input" placeholder="https://..." [(ngModel)]="brandingForm.logoUrl" [disabled]="saving"/>
+            <p style="font-size:12px;color:var(--gray-500);margin-top:4px">
+              Cole o URL de uma imagem para usar como logo do tenant
+            </p>
+            <div *ngIf="brandingForm.logoUrl" style="margin-top:12px;display:flex;align-items:center;gap:12px">
+              <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:var(--gray-100);display:flex;align-items:center;justify-content:center">
+                <img [src]="brandingForm.logoUrl" alt="Preview" style="max-width:100%;max-height:100%;object-fit:contain" (error)="brandingForm.logoUrl = ''" />
+              </div>
+              <span style="font-size:12px;color:var(--gray-600)">Preview do logo</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cor Primária</label>
+            <div style="display:flex;gap:12px;align-items:center">
+              <input type="color" [(ngModel)]="brandingForm.primaryColor" [disabled]="saving" style="width:60px;height:40px;border:1px solid var(--gray-300);border-radius:6px;cursor:pointer"/>
+              <input type="text" class="form-input" [(ngModel)]="brandingForm.primaryColor" [disabled]="saving" placeholder="#6366f1" style="flex:1"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cor Secundária</label>
+            <div style="display:flex;gap:12px;align-items:center">
+              <input type="color" [(ngModel)]="brandingForm.secondaryColor" [disabled]="saving" style="width:60px;height:40px;border:1px solid var(--gray-300);border-radius:6px;cursor:pointer"/>
+              <input type="text" class="form-input" [(ngModel)]="brandingForm.secondaryColor" [disabled]="saving" placeholder="#8b5cf6" style="flex:1"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="closeModal()" [disabled]="saving">Cancelar</button>
+      <button class="btn-primary" (click)="submitEditBranding()" [disabled]="saving || loadingTenant">
+        {{ saving ? 'Salvando...' : 'Salvar Branding' }}
       </button>
     </div>
   </div>

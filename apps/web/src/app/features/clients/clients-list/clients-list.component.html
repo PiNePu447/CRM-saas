@@ -1,144 +1,208 @@
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Empresas</h1>
-      <p class="page-subtitle">Gerencie as empresas e suas equipes de contatos</p>
-    </div>
-    <button class="btn-primary" (click)="openCreateModal()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Nova Empresa
-    </button>
-  </div>
-
-  <div class="filters-bar">
-    <input
-      type="text"
-      class="form-input search-input"
-      placeholder="Buscar empresa..."
-      [(ngModel)]="search"
-      (ngModelChange)="onSearchChange()"
-      style="max-width: 360px;"
-    />
-  </div>
-
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner-lg"></div>
-  </div>
-
-  <div *ngIf="!loading" class="clients-list">
-    <div *ngIf="companies.length === 0" class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-      <p>Nenhuma empresa encontrada.</p>
-      <button class="btn-primary" style="margin-top:12px" (click)="openCreateModal()">Adicionar Empresa</button>
-    </div>
-
-    <div *ngFor="let company of companies" class="company-card">
-      <!-- Delete confirmation overlay -->
-      <div *ngIf="deleteConfirmId === company.id" class="delete-confirm-bar">
-        <span>Remover <strong>{{ company.name }}</strong>? Esta ação não pode ser desfeita.</span>
-        <div style="display:flex;gap:8px">
-          <button class="btn-ghost" (click)="cancelDelete()" [disabled]="deleting">Cancelar</button>
-          <button class="btn-danger" (click)="deleteCompany()" [disabled]="deleting">
-            {{ deleting ? 'Removendo...' : 'Confirmar Remoção' }}
-          </button>
-        </div>
+<main class="p-margin-page">
+  <div class="max-w-container-max mx-auto flex flex-col gap-stack-lg">
+    <!-- Page Header -->
+    <div class="flex justify-between items-start gap-4 flex-wrap">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-background">Empresas</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Gerencie as empresas e suas equipes de contatos.
+        </p>
       </div>
+      <button 
+        class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+        (click)="openCreateModal()">
+        <span class="material-symbols-outlined text-lg">add</span>
+        Nova Empresa
+      </button>
+    </div>
 
-      <!-- Company Header (clickable accordion) -->
-      <div class="company-header" (click)="toggleCompany(company)" *ngIf="deleteConfirmId !== company.id">
-        <div class="company-info">
-          <div class="company-avatar">{{ company.name.charAt(0).toUpperCase() }}</div>
-          <div class="company-details">
-            <span class="company-name">{{ company.name }}</span>
-            <div class="company-meta">
-              <span *ngIf="company.industry" class="company-industry">{{ company.industry }}</span>
-              <span *ngIf="company.domain" class="company-domain">{{ company.domain }}</span>
-              <span *ngIf="company.size" class="company-size">{{ company.size }} func.</span>
-              <span *ngIf="company.status" class="badge" [ngClass]="companyStatusClass(company.status)">
+    <!-- Search Bar -->
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+      <input
+        type="text"
+        class="w-full max-w-md pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+        placeholder="Buscar empresa..."
+        [(ngModel)]="search"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex items-center justify-center py-20">
+      <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && companies.length === 0" class="flex flex-col items-center justify-center py-16 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl">
+      <span class="material-symbols-outlined text-6xl text-outline mb-4">domain</span>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Nenhuma empresa encontrada.</p>
+      <button 
+        class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+        (click)="openCreateModal()">
+        <span class="material-symbols-outlined text-lg">add</span>
+        Adicionar Empresa
+      </button>
+    </div>
+
+    <!-- Companies List -->
+    <div *ngIf="!loading && companies.length > 0" class="flex flex-col gap-3">
+      <div *ngFor="let company of companies" class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+        <!-- Delete Confirmation Bar -->
+        <div *ngIf="deleteConfirmId === company.id" class="bg-error/10 px-4 py-3 border-b border-error/20 flex items-center justify-between gap-4">
+          <span class="font-body-sm text-body-sm text-error">
+            Remover <strong>{{ company.name }}</strong>? Esta ação não pode ser desfeita.
+          </span>
+          <div class="flex items-center gap-2">
+            <button 
+              class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-sm text-label-sm"
+              (click)="cancelDelete()" 
+              [disabled]="deleting">
+              Cancelar
+            </button>
+            <button 
+              class="px-3 py-1.5 bg-error text-on-error rounded-lg font-label-sm text-label-sm hover:brightness-110 transition-colors"
+              (click)="deleteCompany()" 
+              [disabled]="deleting">
+              {{ deleting ? 'Removendo...' : 'Confirmar Remoção' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Company Header (Accordion) -->
+        <div 
+          *ngIf="deleteConfirmId !== company.id"
+          class="flex items-center gap-4 px-4 py-4 cursor-pointer hover:bg-surface-container-low transition-colors"
+          (click)="toggleCompany(company)">
+          <!-- Avatar -->
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
+            <span class="text-on-primary-container font-medium text-lg">
+              {{ company.name.charAt(0).toUpperCase() }}
+            </span>
+          </div>
+
+          <!-- Company Info -->
+          <div class="flex-1 min-w-0">
+            <div class="font-headline-sm text-headline-sm text-on-background">
+              {{ company.name }}
+            </div>
+            <div class="flex items-center gap-3 mt-1 flex-wrap">
+              <span *ngIf="company.industry" class="font-body-sm text-body-sm text-on-surface-variant">
+                {{ company.industry }}
+              </span>
+              <span *ngIf="company.domain" class="font-body-sm text-body-sm text-on-surface-variant">
+                {{ company.domain }}
+              </span>
+              <span *ngIf="company.size" class="font-body-sm text-body-sm text-on-surface-variant">
+                {{ company.size }} funcionários
+              </span>
+              <span *ngIf="company.status" 
+                    class="px-2 py-0.5 rounded-full font-label-sm text-label-sm"
+                    [class.bg-surface-container]="company.status === 'PROSPECT'"
+                    [class.text-on-surface]="company.status === 'PROSPECT'"
+                    [class.bg-success/10]="company.status === 'ACTIVE'"
+                    [class.text-success]="company.status === 'ACTIVE'"
+                    [class.bg-warning/10]="company.status === 'INACTIVE'"
+                    [class.text-warning]="company.status === 'INACTIVE'"
+                    [class.bg-error/10]="company.status === 'CHURNED'"
+                    [class.text-error]="company.status === 'CHURNED'">
                 {{ companyStatusLabel(company.status) }}
               </span>
-              <span *ngIf="company.owner" class="company-owner" title="Vendedor responsável">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                {{ company.owner.name }}
+              <span class="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-sm">account_circle</span>
+                {{ company.owner ? company.owner.name : 'Sem responsável' }}
               </span>
-              <span *ngIf="!company.owner" class="company-owner text-muted" title="Sem vendedor atribuído">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                Sem responsável
-              </span>
-              <span class="company-count">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
+              <span class="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-sm">group</span>
                 {{ company._count?.contacts ?? 0 }} contato(s)
               </span>
             </div>
           </div>
-        </div>
-        <div class="company-actions">
-          <button class="btn-ghost-sm" title="Editar empresa" (click)="openEditModal(company, $event)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-          <button class="btn-ghost-sm btn-danger-sm" title="Remover empresa" (click)="confirmDelete(company.id, $event)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-              <path d="M10 11v6"/><path d="M14 11v6"/>
-              <path d="M9 6V4h6v2"/>
-            </svg>
-          </button>
-          <div class="company-toggle" [class.expanded]="company.expanded">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button 
+              class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all"
+              (click)="openEditModal(company, $event)" 
+              title="Editar empresa">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button 
+              class="p-2 rounded-full text-error hover:bg-error/10 transition-all"
+              (click)="confirmDelete(company.id, $event)" 
+              title="Remover empresa">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+            <div class="p-2">
+              <span 
+                class="material-symbols-outlined text-lg text-on-surface-variant transition-transform"
+                [class.rotate-180]="company.expanded">
+                expand_more
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Contacts List (expanded) -->
-      <div *ngIf="company.expanded && deleteConfirmId !== company.id" class="company-contacts">
-        <div *ngIf="company.loadingContacts" class="loading-state-sm">
-          <div class="spinner"></div>
-        </div>
+        <!-- Contacts List (Expanded) -->
+        <div *ngIf="company.expanded && deleteConfirmId !== company.id" class="border-t border-outline-variant bg-surface-container-low/50">
+          <!-- Loading Contacts -->
+          <div *ngIf="company.loadingContacts" class="flex items-center justify-center py-8">
+            <div class="inline-block w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          </div>
 
-        <div *ngIf="!company.loadingContacts">
-          <div *ngIf="!company.contacts?.length" class="empty-state-sm">
+          <!-- No Contacts -->
+          <div *ngIf="!company.loadingContacts && (!company.contacts || company.contacts.length === 0)" class="px-4 py-8 text-center font-body-sm text-body-sm text-on-surface-variant">
             Nenhum contato nesta empresa.
           </div>
-          <a
-            *ngFor="let contact of company.contacts"
-            [routerLink]="['/contacts', contact.id]"
-            class="contact-row"
-          >
-            <div class="contact-avatar-sm">{{ contact.name.charAt(0).toUpperCase() }}</div>
-            <div class="contact-row-info">
-              <span class="contact-row-name">{{ contact.name }}</span>
-              <span *ngIf="contact.email" class="contact-row-email">{{ contact.email }}</span>
-            </div>
-            <span class="badge" [ngClass]="contactStatusClass(contact.status)">
-              {{ contactStatusLabel(contact.status) }}
-            </span>
-          </a>
+
+          <!-- Contacts -->
+          <div *ngIf="!company.loadingContacts && company.contacts && company.contacts.length > 0" class="divide-y divide-outline-variant">
+            <a
+              *ngFor="let contact of company.contacts"
+              [routerLink]="['/contacts', contact.id]"
+              class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low transition-colors">
+              <!-- Contact Avatar -->
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+                <span class="text-on-surface font-medium text-sm">
+                  {{ contact.name.charAt(0).toUpperCase() }}
+                </span>
+              </div>
+
+              <!-- Contact Info -->
+              <div class="flex-1 min-w-0">
+                <div class="font-body-md text-body-md text-on-background">
+                  {{ contact.name }}
+                </div>
+                <div *ngIf="contact.email" class="font-body-sm text-body-sm text-on-surface-variant truncate">
+                  {{ contact.email }}
+                </div>
+              </div>
+
+              <!-- Contact Status -->
+              <span 
+                class="flex-shrink-0 px-2 py-0.5 rounded-full font-label-sm text-label-sm"
+                [class.bg-surface-container]="contact.status === 'LEAD'"
+                [class.text-on-surface]="contact.status === 'LEAD'"
+                [class.bg-primary/10]="contact.status === 'QUALIFIED'"
+                [class.text-primary]="contact.status === 'QUALIFIED'"
+                [class.bg-success/10]="contact.status === 'CUSTOMER'"
+                [class.text-success]="contact.status === 'CUSTOMER'"
+                [class.bg-warning/10]="contact.status === 'CHURNED'"
+                [class.text-warning]="contact.status === 'CHURNED'"
+                [class.bg-error/10]="contact.status === 'LOST'"
+                [class.text-error]="contact.status === 'LOST'">
+                {{ contactStatusLabel(contact.status) }}
+              </span>
+
+              <!-- Arrow -->
+              <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</main>
 
 <!-- Create / Edit Modal -->
 <app-company-form
