@@ -10,14 +10,15 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { IsString, MinLength, MaxLength } from 'class-validator';
+import { IsString, Matches, MinLength, MaxLength } from 'class-validator';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterDto, STRONG_PASSWORD_REGEX, STRONG_PASSWORD_MESSAGE } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser, CurrentUserData } from '../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PlatformAdminGuard } from '../../common/guards/platform-admin.guard';
 
 class ChangePasswordDto {
   @IsString()
@@ -25,8 +26,7 @@ class ChangePasswordDto {
   currentPassword: string;
 
   @IsString()
-  @MinLength(8)
-  @MaxLength(64)
+  @Matches(STRONG_PASSWORD_REGEX, { message: STRONG_PASSWORD_MESSAGE })
   newPassword: string;
 }
 
@@ -35,10 +35,10 @@ class ChangePasswordDto {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
+  @UseGuards(JwtAuthGuard, PlatformAdminGuard)
   @Post('register')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
-  @ApiOperation({ summary: 'Register a new tenant and admin user' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new tenant and admin user (PLATFORM_ADMIN only)' })
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }

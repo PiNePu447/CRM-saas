@@ -1,6 +1,35 @@
 <div class="app-layout">
-  <app-sidebar></app-sidebar>
+  <!-- Overlay (mobile only) -->
+  <div
+    class="sidebar-overlay"
+    [class.sidebar-open]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
+
+  <app-sidebar
+    [isOpen]="sidebarOpen"
+    (closed)="closeSidebar()"
+  ></app-sidebar>
+
   <main class="app-main">
+    <!-- Mobile header with hamburger -->
+    <header class="mobile-header">
+      <div class="mobile-header-logo">
+        <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="10" fill="#4F46E5"/>
+          <path d="M12 20C12 15.582 15.582 12 20 12C22.21 12 24.21 12.895 25.657 14.343L23.536 16.464C22.629 15.557 21.378 15 20 15C17.239 15 15 17.239 15 20C15 22.761 17.239 25 20 25C21.378 25 22.629 24.443 23.536 23.536L25.657 25.657C24.21 27.105 22.21 28 20 28C15.582 28 12 24.418 12 20Z" fill="white"/>
+        </svg>
+        <span>CRM</span>
+      </div>
+      <button class="btn-hamburger" (click)="openSidebar()" aria-label="Abrir menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </header>
+
     <router-outlet></router-outlet>
   </main>
 </div>

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { STRONG_PASSWORD_REGEX, STRONG_PASSWORD_MESSAGE } from '../../auth/dto/register.dto';
 
 export class CreateSuperAdminDto {
   @ApiProperty({ example: 'João Silva' })
@@ -14,7 +15,6 @@ export class CreateSuperAdminDto {
 
   @ApiProperty({ example: 'StrongPass@123', minLength: 8 })
   @IsString()
-  @MinLength(8)
-  @MaxLength(64)
+  @Matches(STRONG_PASSWORD_REGEX, { message: STRONG_PASSWORD_MESSAGE })
   password: string;
 }

@@ -209,12 +209,17 @@ export class DealsService {
   ) {
     const ownerFilter = this.buildOwnerFilter(userId, userRole);
 
+    // SELLER ownership filter always takes precedence; ignore ownerId query param for SELLER
+    const resolvedOwnerFilter =
+      userRole === UserRole.SELLER
+        ? ownerFilter
+        : { ...ownerFilter, ...(ownerId && { ownerId }) };
+
     return this.prisma.deal.findMany({
       where: {
         tenantId,
         deletedAt: null,
-        ...(ownerId && { ownerId }),
-        ...ownerFilter,
+        ...resolvedOwnerFilter,
         ...(pipelineId && { pipelineId }),
         ...(stageId && { stageId }),
       },
@@ -238,8 +243,14 @@ export class DealsService {
 
     const ownerFilter = this.buildOwnerFilter(userId, userRole);
 
+    // SELLER ownership filter always takes precedence; ignore ownerId query param for SELLER
+    const resolvedOwnerFilter =
+      userRole === UserRole.SELLER
+        ? ownerFilter
+        : { ...ownerFilter, ...(ownerId && { ownerId }) };
+
     const deals = await this.prisma.deal.findMany({
-      where: { tenantId, pipelineId, deletedAt: null, ...(ownerId && { ownerId }), ...ownerFilter },
+      where: { tenantId, pipelineId, deletedAt: null, ...resolvedOwnerFilter },
       include: {
         contact: { select: { id: true, name: true, email: true } },
         owner: { select: { id: true, name: true } },

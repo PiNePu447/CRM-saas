@@ -68,7 +68,7 @@ export class TasksController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a task by ID' })
   findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
-    return this.tasksService.findOne(id, user.tenantId);
+    return this.tasksService.findOne(id, user.tenantId, user.sub, user.role);
   }
 
   @Post()
@@ -84,27 +84,27 @@ export class TasksController {
     @CurrentUser() user: CurrentUserData,
     @Body() dto: Partial<CreateTaskDto>,
   ) {
-    return this.tasksService.update(id, user.tenantId, dto);
+    return this.tasksService.update(id, user.tenantId, user.sub, user.role, dto);
   }
 
   @Patch(':id/complete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark a task as completed' })
   complete(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
-    return this.tasksService.complete(id, user.tenantId);
+    return this.tasksService.complete(id, user.tenantId, user.sub, user.role);
   }
 
   @Patch(':id/reopen')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reopen a completed task' })
   reopen(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
-    return this.tasksService.reopen(id, user.tenantId);
+    return this.tasksService.reopen(id, user.tenantId, user.sub, user.role);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a task' })
   remove(@Param('id') id: string, @CurrentUser() user: CurrentUserData) {
-    return this.tasksService.remove(id, user.tenantId);
+    return this.tasksService.remove(id, user.tenantId, user.sub, user.role);
   }
 }

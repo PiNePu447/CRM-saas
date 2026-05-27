@@ -42,7 +42,7 @@ export class UsersController {
   }
 
   @Post('invite')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Invite a new user to the tenant' })
   invite(@CurrentUser() user: CurrentUserData, @Body() dto: InviteUserDto) {
     return this.usersService.invite(user.tenantId, dto);

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface NavItem {
@@ -12,6 +12,9 @@ interface NavItem {
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
+  @Input() isOpen = false;
+  @Output() closed = new EventEmitter<void>();
+
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'grid' },
     { label: 'Contatos', route: '/contacts', icon: 'users' },
@@ -21,6 +24,10 @@ export class SidebarComponent {
   ];
 
   constructor(readonly authService: AuthService) {}
+
+  onNavClick(): void {
+    this.closed.emit();
+  }
 
   logout(): void {
     this.authService.logout();

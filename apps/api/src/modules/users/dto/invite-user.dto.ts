@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
-import { UserRole } from '@prisma/client';
+import { IsEmail, IsEnum, IsString, Matches, MinLength } from 'class-validator';
+import { STRONG_PASSWORD_REGEX, STRONG_PASSWORD_MESSAGE } from '../../auth/dto/register.dto';
+
+// Roles assignable within a tenant — PLATFORM_ADMIN and SUPER_ADMIN are excluded
+// to prevent privilege escalation via the user invite endpoint
+export enum TenantUserRole {
+  ADMIN = 'ADMIN',
+  MANAGER = 'MANAGER',
+  SELLER = 'SELLER',
+}
 
 export class InviteUserDto {
   @ApiProperty({ example: 'Maria Souza' })
@@ -12,12 +20,12 @@ export class InviteUserDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ enum: UserRole, default: UserRole.SELLER })
-  @IsEnum(UserRole)
-  role: UserRole;
+  @ApiProperty({ enum: TenantUserRole, default: TenantUserRole.SELLER })
+  @IsEnum(TenantUserRole)
+  role: TenantUserRole;
 
   @ApiProperty({ example: 'TempPass@123', minLength: 8 })
   @IsString()
-  @MinLength(8)
+  @Matches(STRONG_PASSWORD_REGEX, { message: STRONG_PASSWORD_MESSAGE })
   temporaryPassword: string;
 }

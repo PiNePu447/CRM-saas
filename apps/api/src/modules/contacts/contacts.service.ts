@@ -26,12 +26,17 @@ export class ContactsService {
 
     const ownerFilter = this.buildOwnershipFilter(userId, userRole);
 
+    // SELLER ownership filter always takes precedence; ignore ownerId query param for SELLER
+    const resolvedOwnerFilter =
+      userRole === UserRole.SELLER
+        ? ownerFilter
+        : { ...ownerFilter, ...(ownerId && { ownerId }) };
+
     const where = {
       tenantId,
       deletedAt: null,
-      ...ownerFilter,
+      ...resolvedOwnerFilter,
       ...(status && { status }),
-      ...(ownerId && { ownerId }),
       ...(companyId && { companyId }),
       ...(tagId && { tags: { some: { tagId } } }),
       ...(search && {

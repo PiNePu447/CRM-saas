@@ -1,10 +1,16 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.sidebar-open]="isOpen">
   <div class="sidebar-logo">
     <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
       <rect width="40" height="40" rx="10" fill="#4F46E5"/>
       <path d="M12 20C12 15.582 15.582 12 20 12C22.21 12 24.21 12.895 25.657 14.343L23.536 16.464C22.629 15.557 21.378 15 20 15C17.239 15 15 17.239 15 20C15 22.761 17.239 25 20 25C21.378 25 22.629 24.443 23.536 23.536L25.657 25.657C24.21 27.105 22.21 28 20 28C15.582 28 12 24.418 12 20Z" fill="white"/>
     </svg>
     <span class="sidebar-logo-text">CRM</span>
+    <button class="btn-hamburger" style="margin-left:auto" (click)="onNavClick()" aria-label="Fechar menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </div>
 
   <nav class="sidebar-nav">
@@ -13,6 +19,7 @@
       [routerLink]="item.route"
       routerLinkActive="nav-item-active"
       class="nav-item"
+      (click)="onNavClick()"
     >
       <span class="nav-icon">
         <ng-container [ngSwitch]="item.icon">

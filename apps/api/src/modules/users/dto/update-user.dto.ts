@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
-import { UserRole } from '@prisma/client';
+import { TenantUserRole } from './invite-user.dto';
 
 export class UpdateUserDto {
   @ApiPropertyOptional()
@@ -9,10 +9,12 @@ export class UpdateUserDto {
   @MinLength(2)
   name?: string;
 
-  @ApiPropertyOptional({ enum: UserRole })
+  // Restricted to tenant-level roles only — PLATFORM_ADMIN and SUPER_ADMIN cannot be
+  // assigned via this endpoint to prevent privilege escalation
+  @ApiPropertyOptional({ enum: TenantUserRole })
   @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+  @IsEnum(TenantUserRole)
+  role?: TenantUserRole;
 
   @ApiPropertyOptional()
   @IsOptional()

@@ -30,13 +30,18 @@ export class TasksService {
   ) {
     const ownerFilter = this.buildOwnerFilter(userId, userRole);
 
+    // SELLER ownership filter always takes precedence; ignore assignedTo query param for SELLER
+    const resolvedOwnerFilter =
+      userRole === UserRole.SELLER
+        ? ownerFilter
+        : { ...ownerFilter, ...(options.assignedTo && { assignedTo: options.assignedTo }) };
+
     return this.prisma.task.findMany({
       where: {
         tenantId,
-        ...ownerFilter,
+        ...resolvedOwnerFilter,
         ...(options.contactId && { contactId: options.contactId }),
         ...(options.dealId && { dealId: options.dealId }),
-        ...(options.assignedTo && { assignedTo: options.assignedTo }),
         ...(options.completed === true && { completedAt: { not: null } }),
         ...(options.completed === false && { completedAt: null }),
         ...(options.dueBefore && { dueDate: { lte: new Date(options.dueBefore) } }),
@@ -75,9 +80,11 @@ export class TasksService {
     });
   }
 
-  async findOne(id: string, tenantId: string) {
+  async findOne(id: string, tenantId: string, userId: string, userRole: string) {
+    const ownerFilter = this.buildOwnerFilter(userId, userRole);
+
     const task = await this.prisma.task.findFirst({
-      where: { id, tenantId },
+      where: { id, tenantId, ...ownerFilter },
       include: {
         assignee: { select: { id: true, name: true } },
         contact: { select: { id: true, name: true } },
@@ -85,6 +92,15 @@ export class TasksService {
       },
     });
 
+    if (!task) throw new NotFoundException(`Task ${id} not found`);
+    return task;
+  }
+
+  private async assertCanModify(id: string, tenantId: string, userId: string, userRole: string) {
+    const ownerFilter = this.buildOwnerFilter(userId, userRole);
+    const task = await this.prisma.task.findFirst({
+      where: { id, tenantId, ...ownerFilter },
+    });
     if (!task) throw new NotFoundException(`Task ${id} not found`);
     return task;
   }
@@ -140,8 +156,8 @@ export class TasksService {
     return task;
   }
 
-  async update(id: string, tenantId: string, dto: UpdateTaskDto) {
-    await this.findOne(id, tenantId);
+  async update(id: string, tenantId: string, userId: string, userRole: string, dto: UpdateTaskDto) {
+    await this.assertCanModify(id, tenantId, userId, userRole);
 
     return this.prisma.task.update({
       where: { id },
@@ -156,8 +172,8 @@ export class TasksService {
     });
   }
 
-  async complete(id: string, tenantId: string) {
-    await this.findOne(id, tenantId);
+  async complete(id: string, tenantId: string, userId: string, userRole: string) {
+    await this.assertCanModify(id, tenantId, userId, userRole);
 
     return this.prisma.task.update({
       where: { id },
@@ -165,13 +181,13 @@ export class TasksService {
     });
   }
 
-  async reopen(id: string, tenantId: string) {
-    await this.findOne(id, tenantId);
+  async reopen(id: string, tenantId: string, userId: string, userRole: string) {
+    await this.assertCanModify(id, tenantId, userId, userRole);
     return this.prisma.task.update({ where: { id }, data: { completedAt: null } });
   }
 
-  async remove(id: string, tenantId: string) {
-    await this.findOne(id, tenantId);
+  async remove(id: string, tenantId: string, userId: string, userRole: string) {
+    await this.assertCanModify(id, tenantId, userId, userRole);
     await this.prisma.task.delete({ where: { id } });
   }
 }
