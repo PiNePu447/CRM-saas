@@ -96,16 +96,12 @@
               <span *ngIf="company.size" class="font-body-sm text-body-sm text-on-surface-variant">
                 {{ company.size }} funcionários
               </span>
-              <span *ngIf="company.status" 
-                    class="px-2 py-0.5 rounded-full font-label-sm text-label-sm"
-                    [class.bg-surface-container]="company.status === 'PROSPECT'"
-                    [class.text-on-surface]="company.status === 'PROSPECT'"
-                    [class.bg-success/10]="company.status === 'ACTIVE'"
-                    [class.text-success]="company.status === 'ACTIVE'"
-                    [class.bg-warning/10]="company.status === 'INACTIVE'"
-                    [class.text-warning]="company.status === 'INACTIVE'"
-                    [class.bg-error/10]="company.status === 'CHURNED'"
-                    [class.text-error]="company.status === 'CHURNED'">
+              <span *ngIf="company.status" class="px-2 py-0.5 rounded-full font-label-sm text-label-sm" [ngClass]="{
+                'bg-surface-container text-on-surface': company.status === 'PROSPECT',
+                'bg-success/10 text-success': company.status === 'ACTIVE',
+                'bg-warning/10 text-warning': company.status === 'INACTIVE',
+                'bg-error/10 text-error': company.status === 'CHURNED'
+              }">
                 {{ companyStatusLabel(company.status) }}
               </span>
               <span class="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant">
@@ -179,18 +175,13 @@
               </div>
 
               <!-- Contact Status -->
-              <span 
-                class="flex-shrink-0 px-2 py-0.5 rounded-full font-label-sm text-label-sm"
-                [class.bg-surface-container]="contact.status === 'LEAD'"
-                [class.text-on-surface]="contact.status === 'LEAD'"
-                [class.bg-primary/10]="contact.status === 'QUALIFIED'"
-                [class.text-primary]="contact.status === 'QUALIFIED'"
-                [class.bg-success/10]="contact.status === 'CUSTOMER'"
-                [class.text-success]="contact.status === 'CUSTOMER'"
-                [class.bg-warning/10]="contact.status === 'CHURNED'"
-                [class.text-warning]="contact.status === 'CHURNED'"
-                [class.bg-error/10]="contact.status === 'LOST'"
-                [class.text-error]="contact.status === 'LOST'">
+              <span class="flex-shrink-0 px-2 py-0.5 rounded-full font-label-sm text-label-sm" [ngClass]="{
+                'bg-surface-container text-on-surface': contact.status === 'LEAD',
+                'bg-primary/10 text-primary': contact.status === 'QUALIFIED',
+                'bg-success/10 text-success': contact.status === 'CUSTOMER',
+                'bg-warning/10 text-warning': contact.status === 'CHURNED',
+                'bg-error/10 text-error': contact.status === 'LOST'
+              }">
                 {{ contactStatusLabel(contact.status) }}
               </span>
 

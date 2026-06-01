@@ -62,7 +62,11 @@
           class="form-input"
           formControlName="phone"
           placeholder="Ex: +55 11 99999-9999"
+          [class.input-error]="hasNoContactMethod"
         />
+        <span *ngIf="hasNoContactMethod" class="field-error">
+          É obrigatório informar pelo menos um meio de contato (e-mail ou telefone)
+        </span>
       </div>
 
       <div class="form-group">

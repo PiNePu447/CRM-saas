@@ -27,7 +27,7 @@
     <div class="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
       <h3 class="font-headline-sm text-headline-sm text-on-background">Notificações</h3>
       <button 
-        *ngIf="notifications.some(n => !n.read)"
+        *ngIf="hasUnreadNotifications"
         class="text-primary font-label-sm text-label-sm hover:underline"
         (click)="markAllAsRead()">
         Marcar todas como lidas
@@ -47,16 +47,9 @@
 
     <!-- Notifications List -->
     <div *ngIf="!loading && notifications.length > 0" class="max-h-96 overflow-y-auto">
-      <div 
-        *ngFor="let notification of notifications"
-        class="px-4 py-3 border-b border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer"
-        [class.bg-primary-container/10]="!notification.read"
-        (click)="markAsRead(notification, $event)">
+      <div *ngFor="let notification of notifications" class="px-4 py-3 border-b border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer" [ngClass]="{'bg-primary-container/10': !notification.read}" (click)="markAsRead(notification, $event)">
         <div class="flex items-start gap-3">
-          <div 
-            class="flex-shrink-0 w-2 h-2 rounded-full mt-1.5"
-            [class.bg-primary]="!notification.read"
-            [class.bg-transparent]="notification.read">
+          <div class="flex-shrink-0 w-2 h-2 rounded-full mt-1.5" [ngClass]="{'bg-primary': !notification.read, 'bg-transparent': notification.read}">
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-label-md text-label-md text-on-background">

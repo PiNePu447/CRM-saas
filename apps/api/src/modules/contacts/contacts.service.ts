@@ -103,6 +103,11 @@ export class ContactsService {
   }
 
   async create(tenantId: string, userId: string, userRole: string, dto: CreateContactDto) {
+    // Validate at least one contact method
+    if (!dto.email && !dto.phone) {
+      throw new ConflictException('É necessário fornecer pelo menos um meio de contato (email ou telefone)');
+    }
+
     const ownerId = dto.ownerId && userRole !== UserRole.SELLER ? dto.ownerId : userId;
     const { tagIds, birthDate, ...data } = dto;
 

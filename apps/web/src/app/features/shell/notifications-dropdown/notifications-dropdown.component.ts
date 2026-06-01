@@ -58,6 +58,10 @@ export class NotificationsDropdownComponent implements OnInit {
     });
   }
 
+  get hasUnreadNotifications(): boolean {
+    return this.notifications.some((n) => !n.read);
+  }
+
   getTimeAgo(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();

@@ -26,29 +26,31 @@
 
   <!-- Dropdown Menu -->
   <div 
-    *ngIf="isOpen && (authService.currentUser$ | async as user)"
+    *ngIf="isOpen"
     class="absolute right-0 mt-2 w-64 bg-surface border border-outline-variant rounded-xl shadow-lg z-50 overflow-hidden">
-    <!-- User Info -->
-    <div class="px-4 py-3 border-b border-outline-variant">
-      <div class="font-label-md text-label-md text-on-background">{{ user.name }}</div>
-      <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">{{ user.email }}</div>
-    </div>
+    <ng-container *ngIf="authService.currentUser$ | async as user">
+      <!-- User Info -->
+      <div class="px-4 py-3 border-b border-outline-variant">
+        <div class="font-label-md text-label-md text-on-background">{{ user.name }}</div>
+        <div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">{{ user.email }}</div>
+      </div>
 
-    <!-- Menu Items -->
-    <div class="py-2">
-      <button 
-        class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors"
-        (click)="openEditModal()">
-        <span class="material-symbols-outlined text-lg">edit</span>
-        <span class="font-label-md text-label-md">Editar Perfil</span>
-      </button>
-      <button 
-        class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors"
-        (click)="logout()">
-        <span class="material-symbols-outlined text-lg">logout</span>
-        <span class="font-label-md text-label-md">Sair</span>
-      </button>
-    </div>
+      <!-- Menu Items -->
+      <div class="py-2">
+        <button 
+          class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors"
+          (click)="openEditModal()">
+          <span class="material-symbols-outlined text-lg">edit</span>
+          <span class="font-label-md text-label-md">Editar Perfil</span>
+        </button>
+        <button 
+          class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors"
+          (click)="logout()">
+          <span class="material-symbols-outlined text-lg">logout</span>
+          <span class="font-label-md text-label-md">Sair</span>
+        </button>
+      </div>
+    </ng-container>
   </div>
 </div>
 

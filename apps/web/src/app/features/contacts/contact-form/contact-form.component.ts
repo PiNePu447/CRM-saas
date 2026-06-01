@@ -1,9 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidationErrors, AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsService } from '../../../core/services/contacts.service';
 import { CompaniesService, Company } from '../../../core/services/companies.service';
 import { Contact, ContactStatus } from '../../../core/models/contact.models';
+
+function atLeastOneContactMethod(control: AbstractControl): ValidationErrors | null {
+  const email = control.get('email')?.value;
+  const phone = control.get('phone')?.value;
+  return (email && email.trim()) || (phone && phone.trim()) 
+    ? null 
+    : { noContactMethod: true };
+}
 
 @Component({
   standalone: false,
@@ -44,7 +52,7 @@ export class ContactFormComponent implements OnInit {
       companyId: [''],
       birthDate: [''],
       status: ['LEAD'],
-    });
+    }, { validators: atLeastOneContactMethod });
 
     this.companiesService.list().subscribe({
       next: (companies) => (this.companies = companies),
@@ -109,6 +117,11 @@ export class ContactFormComponent implements OnInit {
         this.error = err?.error?.message ?? 'Erro ao salvar contato. Tente novamente.';
       },
     });
+  }
+
+  get hasNoContactMethod(): boolean {
+    return !!this.form.errors?.['noContactMethod'] && 
+           !!(this.form.get('email')?.touched || this.form.get('phone')?.touched);
   }
 
   cancel(): void {

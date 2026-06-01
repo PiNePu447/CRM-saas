@@ -1,142 +1,169 @@
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Painel da Plataforma</h1>
-      <p class="page-subtitle">Gerencie todos os tenants e seus administradores</p>
-    </div>
-    <div class="page-header-actions">
-      <button class="btn-ghost" (click)="authService.logout()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        Sair
-      </button>
-      <button class="btn-primary" (click)="openCreateTenant()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        Novo Tenant
-      </button>
-    </div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-grid" style="margin-bottom:24px">
-    <div class="stat-card">
-      <div class="stat-icon stat-icon-blue">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
+<main class="p-margin-page">
+  <div class="max-w-container-max mx-auto flex flex-col gap-stack-lg">
+    <!-- Page Header -->
+    <div class="flex justify-between items-start gap-4 flex-wrap">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-background">Painel da Plataforma</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Gerencie todos os tenants e seus administradores
+        </p>
       </div>
-      <div class="stat-info">
-        <span class="stat-value">{{ tenants.length }}</span>
-        <span class="stat-label">Total de Tenants</span>
+      <div class="flex items-center gap-2">
+        <button 
+          class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-md text-label-md border border-outline-variant flex items-center gap-2"
+          (click)="authService.logout()">
+          <span class="material-symbols-outlined text-lg">logout</span>
+          Sair
+        </button>
+        <button 
+          class="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-colors shadow-primary-glow flex items-center gap-2"
+          (click)="openCreateTenant()">
+          <span class="material-symbols-outlined text-lg">add</span>
+          Novo Tenant
+        </button>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon-green">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        </svg>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl px-6 py-5 flex items-center gap-4 shadow-sm">
+        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-2xl text-primary">domain</span>
+        </div>
+        <div>
+          <div class="font-headline-md text-headline-md text-on-background">{{ tenants.length }}</div>
+          <div class="font-body-sm text-body-sm text-on-surface-variant">Total de Tenants</div>
+        </div>
       </div>
-      <div class="stat-info">
-        <span class="stat-value">{{ activeTenantCount }}</span>
-        <span class="stat-label">Tenants Ativos</span>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl px-6 py-5 flex items-center gap-4 shadow-sm">
+        <div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-2xl text-success">check_circle</span>
+        </div>
+        <div>
+          <div class="font-headline-md text-headline-md text-on-background">{{ activeTenantCount }}</div>
+          <div class="font-body-sm text-body-sm text-on-surface-variant">Tenants Ativos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+      <input
+        type="text"
+        class="w-full max-w-md pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+        placeholder="Buscar tenant..."
+        [(ngModel)]="search"
+      />
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex items-center justify-center py-20">
+      <div class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div *ngIf="!loading" class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-surface-container-high">
+            <tr class="border-b border-outline-variant">
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Tenant</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Slug</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Usuários</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Contatos</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Negócios</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Status</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant">Criado em</th>
+              <th class="px-4 py-3 font-label-sm text-label-sm text-on-surface-variant text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="filteredTenants.length === 0" class="border-b border-outline-variant">
+              <td colspan="8" class="px-4 py-12 text-center font-body-sm text-body-sm text-on-surface-variant">
+                Nenhum tenant encontrado.
+              </td>
+            </tr>
+            <tr *ngFor="let tenant of filteredTenants" class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+                    <span class="text-on-primary-container font-medium text-sm">
+                      {{ tenant.name.charAt(0).toUpperCase() }}
+                    </span>
+                  </div>
+                  <span class="font-body-md text-body-md text-on-background">{{ tenant.name }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <code class="px-2 py-1 bg-surface-container text-on-surface rounded font-mono font-body-sm text-body-sm">{{ tenant.slug }}</code>
+              </td>
+              <td class="px-4 py-3 font-body-sm text-body-sm text-on-surface">{{ tenant._count.users }}</td>
+              <td class="px-4 py-3 font-body-sm text-body-sm text-on-surface">{{ tenant._count.contacts }}</td>
+              <td class="px-4 py-3 font-body-sm text-body-sm text-on-surface">{{ tenant._count.deals }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm" [ngClass]="isActive(tenant) ? 'bg-success/10 text-success' : 'bg-error/10 text-error'">
+                  {{ isActive(tenant) ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="px-4 py-3 font-body-sm text-body-sm text-on-surface-variant">{{ tenant.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3">
+                <!-- Delete confirmation -->
+                <div *ngIf="deleteConfirmId === tenant.id" class="flex items-center justify-end gap-2">
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">Confirmar?</span>
+                  <button 
+                    class="px-3 py-1.5 bg-error text-on-error rounded-lg font-label-sm text-label-sm hover:brightness-110 transition-colors" 
+                    (click)="deleteTenant()" 
+                    [disabled]="deleting">
+                    Sim
+                  </button>
+                  <button 
+                    class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-sm text-label-sm border border-outline-variant" 
+                    (click)="cancelDelete()">
+                    Não
+                  </button>
+                </div>
+                <div *ngIf="deleteConfirmId !== tenant.id" class="flex items-center justify-end gap-1">
+                  <button 
+                    class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all" 
+                    title="Criar Super Admin" 
+                    (click)="openCreateSuperAdmin(tenant)">
+                    <span class="material-symbols-outlined text-lg">person_add</span>
+                  </button>
+                  <button 
+                    class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all" 
+                    title="Branding" 
+                    (click)="openEditBranding(tenant)">
+                    <span class="material-symbols-outlined text-lg">palette</span>
+                  </button>
+                  <button 
+                    class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all" 
+                    title="Editar tenant" 
+                    (click)="openEditTenant(tenant)">
+                    <span class="material-symbols-outlined text-lg">edit</span>
+                  </button>
+                  <button 
+                    *ngIf="!isActive(tenant)" 
+                    class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-all" 
+                    title="Reativar" 
+                    (click)="reactivateTenant(tenant.id)">
+                    <span class="material-symbols-outlined text-lg">refresh</span>
+                  </button>
+                  <button 
+                    class="p-2 rounded-full text-error hover:bg-error/10 transition-all" 
+                    title="Remover tenant" 
+                    (click)="confirmDelete(tenant.id)">
+                    <span class="material-symbols-outlined text-lg">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-
-  <div class="filters-bar">
-    <input type="text" class="form-input" placeholder="Buscar tenant..." [(ngModel)]="search" style="max-width:360px"/>
-  </div>
-
-  <div *ngIf="loading" class="loading-state"><div class="spinner-lg"></div></div>
-
-  <div *ngIf="!loading" class="table-wrapper">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Tenant</th>
-          <th>Slug</th>
-          <th>Usuários</th>
-          <th>Contatos</th>
-          <th>Negócios</th>
-          <th>Status</th>
-          <th>Criado em</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngIf="filteredTenants.length === 0">
-          <td colspan="8" style="text-align:center;padding:40px;color:var(--gray-400)">
-            Nenhum tenant encontrado.
-          </td>
-        </tr>
-        <tr *ngFor="let tenant of filteredTenants">
-          <td>
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="company-avatar" style="width:34px;height:34px;font-size:14px">
-                {{ tenant.name.charAt(0).toUpperCase() }}
-              </div>
-              <span style="font-weight:600;color:var(--gray-900)">{{ tenant.name }}</span>
-            </div>
-          </td>
-          <td><code style="font-size:12px;background:var(--gray-100);padding:2px 6px;border-radius:4px">{{ tenant.slug }}</code></td>
-          <td>{{ tenant._count.users }}</td>
-          <td>{{ tenant._count.contacts }}</td>
-          <td>{{ tenant._count.deals }}</td>
-          <td>
-            <span class="badge" [ngClass]="isActive(tenant) ? 'badge-green' : 'badge-red'">
-              {{ isActive(tenant) ? 'Ativo' : 'Inativo' }}
-            </span>
-          </td>
-          <td style="font-size:13px;color:var(--gray-500)">{{ tenant.createdAt | date:'dd/MM/yyyy' }}</td>
-          <td>
-            <!-- Delete confirmation -->
-            <div *ngIf="deleteConfirmId === tenant.id" style="display:flex;gap:6px;align-items:center">
-              <span style="font-size:12px;color:var(--gray-600)">Confirmar?</span>
-              <button class="btn-ghost-sm btn-danger-sm" (click)="deleteTenant()" [disabled]="deleting">Sim</button>
-              <button class="btn-ghost-sm" (click)="cancelDelete()">Não</button>
-            </div>
-            <div *ngIf="deleteConfirmId !== tenant.id" style="display:flex;gap:4px;justify-content:flex-end">
-              <button class="btn-ghost-sm" title="Criar Super Admin" (click)="openCreateSuperAdmin(tenant)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </button>
-              <button class="btn-ghost-sm" title="Branding" (click)="openEditBranding(tenant)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.4 4.4l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.4-4.4l4.2-4.2"/>
-                </svg>
-              </button>
-              <button class="btn-ghost-sm" title="Editar tenant" (click)="openEditTenant(tenant)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </button>
-              <button *ngIf="!isActive(tenant)" class="btn-ghost-sm" title="Reativar" (click)="reactivateTenant(tenant.id)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                </svg>
-              </button>
-              <button class="btn-ghost-sm btn-danger-sm" title="Remover tenant" (click)="confirmDelete(tenant.id)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-                  <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+</main>
 
 <!-- Create Tenant Modal -->
 <ng-container *ngIf="modalMode === 'create-tenant'">

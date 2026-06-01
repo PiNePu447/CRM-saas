@@ -9,6 +9,7 @@ import {
   IsString,
   IsUUID,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateContactDto {
@@ -18,13 +19,13 @@ export class CreateContactDto {
   name: string;
 
   @ApiPropertyOptional({ example: 'joao@empresa.com' })
-  @IsOptional()
-  @IsEmail()
+  @ValidateIf((o) => !o.phone || o.email)
+  @IsEmail({}, { message: 'Email inválido' })
   email?: string;
 
   @ApiPropertyOptional({ example: '+55 11 99999-9999' })
-  @IsOptional()
-  @IsString()
+  @ValidateIf((o) => !o.email || o.phone)
+  @IsString({ message: 'Telefone inválido' })
   phone?: string;
 
   @ApiPropertyOptional({ example: '1990-05-13', description: 'Data de nascimento (ISO 8601)' })

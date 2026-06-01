@@ -54,7 +54,7 @@ export class AuthService {
     await this.saveRefreshToken(user.id, tokens.refreshToken);
 
     return {
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, avatarUrl: user.avatarUrl },
       tenant: { id: tenant.id, name: tenant.name, slug: tenant.slug },
       ...tokens,
     };
@@ -80,7 +80,7 @@ export class AuthService {
     await this.saveRefreshToken(user.id, tokens.refreshToken);
 
     return {
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, avatarUrl: user.avatarUrl },
       tenant: user.tenant
         ? { id: user.tenant.id, name: user.tenant.name, slug: user.tenant.slug }
         : null,
@@ -140,6 +140,7 @@ export class AuthService {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatarUrl: user.avatarUrl,
       tenant: user.tenant ?? null,
     };
   }

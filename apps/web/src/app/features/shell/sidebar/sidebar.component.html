@@ -1,12 +1,12 @@
 <aside 
   class="fixed top-0 left-0 h-screen bg-surface border-r border-outline-variant flex flex-col z-50 transition-all duration-300 lg:translate-x-0"
   [class.w-[280px]]="!collapsed"
-  [class.w-[64px]]="collapsed"
+  [class.w-[200px]]="collapsed"
   [class.-translate-x-full]="!isOpen"
   [class.translate-x-0]="isOpen"
 >
   <!-- Logo Area -->
-  <div class="flex items-center gap-3 px-stack-sm py-stack-md border-b border-outline-variant">
+  <div class="flex items-center gap-3 px-stack-sm py-stack-md border-b border-outline-variant min-h-[64px]">
     <div *ngIf="authService.currentUser$ | async as user" class="w-8 h-8 rounded bg-primary-container flex items-center justify-center shadow-primary-glow flex-shrink-0 overflow-hidden">
       <img 
         *ngIf="getTenantLogo(user)"
@@ -17,21 +17,24 @@
         *ngIf="!getTenantLogo(user)"
         class="material-symbols-outlined text-on-primary-container text-xl">domain</span>
     </div>
-    <div *ngIf="!collapsed && (authService.currentUser$ | async as user)" class="flex-1 min-w-0">
-      <h1 class="font-headline-sm text-headline-sm font-bold text-primary truncate">{{ getTenantName(user) }}</h1>
-      <p class="font-label-sm text-label-sm text-outline">CRM</p>
-    </div>
+    <ng-container *ngIf="authService.currentUser$ | async as user">
+      <div class="flex-1 min-w-0">
+        <h1 class="font-headline-sm text-headline-sm font-bold text-primary truncate" [class.text-sm]="collapsed">
+          {{ getTenantName(user) }}
+        </h1>
+        <p *ngIf="!collapsed" class="font-label-sm text-label-sm text-outline">CRM</p>
+      </div>
+    </ng-container>
     <button 
       *ngIf="!collapsed"
-      class="ml-auto p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors lg:hidden" 
+      class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors lg:hidden flex-shrink-0" 
       (click)="onNavClick()" 
       aria-label="Fechar menu"
     >
       <span class="material-symbols-outlined">close</span>
     </button>
     <button 
-      class="p-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors hidden lg:flex"
-      [class.ml-auto]="collapsed"
+      class="p-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors hidden lg:flex flex-shrink-0"
       (click)="onToggleCollapse()"
       [title]="collapsed ? 'Expandir menu' : 'Recolher menu'"
     >

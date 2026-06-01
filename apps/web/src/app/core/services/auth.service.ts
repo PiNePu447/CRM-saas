@@ -24,7 +24,13 @@ export class AuthService {
   constructor(
     private readonly http: HttpClient,
     private readonly router: Router,
-  ) {}
+  ) {
+    // Apply branding on init if user is logged in
+    const user = this.loadUser();
+    if (user) {
+      this.applyBranding(user);
+    }
+  }
 
   get currentUser(): UserProfile | null {
     return this.currentUserSubject.value;
@@ -77,8 +83,26 @@ export class AuthService {
       tap((user) => {
         this.currentUserSubject.next(user);
         localStorage.setItem(USER_KEY, JSON.stringify(user));
+        this.applyBranding(user);
       }),
     );
+  }
+
+  private applyBranding(user: UserProfile): void {
+    const branding = (user.tenant?.settings as any)?.branding;
+    if (!branding) return;
+
+    // Apply primary color if exists
+    if (branding.primaryColor) {
+      document.documentElement.style.setProperty('--tenant-primary', branding.primaryColor);
+      // Update Tailwind CSS variables
+      document.documentElement.style.setProperty('--color-primary', branding.primaryColor);
+    }
+
+    // Apply secondary color if exists
+    if (branding.secondaryColor) {
+      document.documentElement.style.setProperty('--tenant-secondary', branding.secondaryColor);
+    }
   }
 
   getAccessToken(): string | null {
@@ -90,6 +114,7 @@ export class AuthService {
     localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken);
     localStorage.setItem(USER_KEY, JSON.stringify(res.user));
     this.currentUserSubject.next(res.user);
+    this.applyBranding(res.user);
   }
 
   private clearSession(): void {
